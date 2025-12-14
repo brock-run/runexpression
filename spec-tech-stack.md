@@ -1,4 +1,84 @@
-Runexpression Website v1 Tech Stack Refinement
+
+## Runexpression Website (V1) – Technical Specification & Project Plan Addendum
+1. Product Overview
+The Runexpression website is the expressive home for runners and the launchpad for the AI Coach product. V1 focuses on capturing user identity and data through three anchor experiences, optimized for high engagement and future AI utility.
+The Three Core Experiences
+	1	The Manifesto Flow (Homepage): A motion-driven, scroll-based narrative that weaves the brand philosophy into an interactive experience, culminating in a persistent "Join the Expression" call to action (CTA).
+	2	“Why You Run” Interactive Canvas: A communal digital wall where users contribute text and images. Updated Scope: To ensure brand consistency and reduce technical friction, freehand drawing is replaced by a "Sticker & Filter Studio" allowing users to layer branded assets over their photos.
+	3	DWTC Clubhouse Archive: A member-gated repository for club lore and resources. Members can upload permanent artifacts (stories, images), which are structured to feed future AI personalization.
+2. Updated Data & AI Strategy
+V1 is not just about display; it is about structured data capture. We are moving from "blob storage" to "labeled storage" to train the future AI Coach.
+2.1 The "Vibe Tags" Taxonomy
+To seed the AI personality, every contribution to the Canvas or Clubhouse will require the user to select 1-3 tags. These map to the emotional and physical context of the run.
+Taxonomy Structure (v1 Draft):
+	•	The Mindset (Internal): Meditative, Aggressive, Playful, Dark, Grateful, Pain Cave.
+	•	The Context (External): Race Day, Morning Miles, Night Run, Social, Solo, Commute.
+	•	The Feeling (Physical): Float, Grind, Flow, Heavy, Fast, Recovery.
+Why this matters: Future AI Coach can query this: "User X posts 80% 'Grind' content; adjust tone to be supportive/stoic."
+2.2 The "AI Sentinel" Moderation Workflow
+To protect the brand on a public canvas, we will implement a multi-stage defensive workflow.
+The Flow:
+	1	User Submits: User hits "Post" on the Canvas.
+	2	Stage 1: Automated AI Check (Synchronous):
+	•	Text: Payload sent to OpenAI Moderation API (Free tier). Checks for hate speech, harassment, self-harm.
+	•	Result: If flagged → Immediate hard reject (User sees error). If clean → Proceed.
+	3	Stage 2: Trust Scoring:
+	•	New User: Content creates a DB row with visibility: pending and moderation_status: review_queue.
+	•	Optimistic UI: The user sees their post immediately (local state), but the public does not.
+	•	Trusted User (Whitelisted): If user has >3 approved posts, visibility: public.
+	4	Stage 3: Admin Queue: Admin dashboard (Retool/Supabase) lists "Pending" items. Admin clicks "Approve" or "Ban."
+	5	Stage 4: Public Wall: Approved items are pushed to the public Supabase Realtime stream.
+3. Technical Architecture & Stack
+Core Stack
+	•	Frontend: Next.js (React) deployed on Vercel.
+	•	Backend/Data: Supabase (Postgres + Auth + Realtime).
+	•	Media: Supabase Storage with strict file-size policies (Images <5MB, Videos <50MB/30s).
+	•	Payments: Stripe.
+3.1 The Sticker/Filter Tech Stack (Replacing Drawing)
+To allow users to create expressive visual content without the complexity of a drawing engine, we will use image composition libraries.
+Selected Library: fabric.js or react-konva
+	•	Why: These libraries allow us to create a "Canvas" layer over a user's uploaded photo. We can programmatically add PNG "Stickers" (logos, slogans, tape, shapes) that the user can drag, rotate, and resize.
+	•	Filter Implementation: CSS Filters (grayscale, high contrast, sepia) applied to the base image.
+	•	Export: When the user hits submit, the client generates a single composite JPG/PNG to upload to storage. This ensures the output always looks "designed" and high-quality.
+3.2 Database Schema (Key Adjustments)
+Table: expression_events (The Canvas) | Field | Type | Purpose | | :--- | :--- | :--- | | id | UUID | PK | | user_id | UUID | Link to profile (AI readiness) | | type | Enum | text_only, image_composite | | vibe_tags | Array(Text) | New: Stores the taxonomy tags (e.g., ['Pain Cave', 'Night Run']) | | content | Text | The user's story | | media_url | Text | URL to the composite image in Storage | | moderation_status | Enum | pending, approved, rejected, flagged_by_ai | | visibility_score | Int | 0 (Hidden), 1 (User Only), 10 (Public), 100 (Featured) | | ai_embedding | Vector | Future: Reserved for semantic search embeddings |
+Table: users (Profile)
+	•	Added field: trust_score (Int) - Increments with every approved post. Used to auto-approve future content.
+4. User Interface Specifications
+Homepage (The Manifesto)
+	•	Experience: Scroll-driven reveal.
+	•	Tech: Framer Motion for text staggers and opacity reveals.
+	•	Key KPI: Scroll depth to the "Join the Expression" CTA.
+Interactive Canvas (Sticker Studio)
+	•	Input Flow:
+	1	Upload: User selects photo.
+	2	Express: User selects a filter (CSS) and drags 1-3 branded stickers onto the image.
+	3	Context: User types a caption and selects Vibe Tags.
+	4	Submit: Image processed client-side -> Uploaded -> Optimistic UI feedback.
+	•	The Wall: A masonry grid layout (CSS Grid) populated by Supabase Realtime subscription.
+DWTC Clubhouse (Archive)
+	•	Uploads: Member-gated upload zone.
+	•	Optimization: Implement compressorjs on the client side to resize/compress images before upload to save bandwidth costs.
+	•	Browsing: Filter by "Vibe Tag" (e.g., "Show me all 'Race Day' stories").
+5. Development Phases
+Phase 1: Foundation (Weeks 1-2)
+	•	Setup Next.js + Supabase.
+	•	Implement Auth and Database Schema (including new expression_events structure).
+	•	Task: Build the "Vibe Tag" selector component.
+Phase 2: The Canvas & Sticker Engine (Weeks 3-4)
+	•	Integrate fabric.js or react-konva.
+	•	Build the "Sticker Studio" UI (Upload -> Overlay -> Export).
+	•	Task: Implement Client-side image compression.
+Phase 3: Intelligence & Defense (Week 5)
+	•	Task: Connect OpenAI Moderation API to the submission endpoint.
+	•	Task: Build the simple "Admin Queue" page (list pending posts -> Approve/Reject buttons).
+Phase 4: Polish & Launch (Week 6)
+	•	Homepage Manifesto animations.
+	•	End-to-End testing of the "New User" vs. "Trusted User" flow.
+	•	Load testing the Realtime subscription for the Wall.
+
+
+## Runexpression Website v1 Tech Stack Refinement
 1. The "Must Haves"
 These recommendations from your research are spot-on. Adopt them immediately.
 
