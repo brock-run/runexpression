@@ -1,4 +1,4 @@
-## tech approach
+## Tech Approach
 
 1. Core Philosophy & Design Principles
 Before defining features, we define the "Soul" of the application based on your notes.
@@ -74,6 +74,335 @@ Phase 4: The Clubhouse (Weeks 7-8)
 	•	Data: Create the "DWest" club row in the DB.
 	•	Gated Logic: Build the /club/[slug] dynamic route.
 	•	Onboarding: Manually invite your crew members to test the login flow.
+
+## Runexpression Website – Technical Design & Project Plan
+
+Product Overview
+The Runexpression website is the expressive home for runners and the launchpad for the AI Coach experience. At its core, three connected journeys anchor V1:
+	1	Creative, Experimental Homepage: A visually rich, motion-driven landing page that shapes the brand manifesto into an interactive flow, ending in a clear CTA.
+	2	“Why You Run” Interactive Canvas: A living, communal wall (the Flow) encouraging all visitors to express what their run meant—capturing emotion through text, images, or art, instantly woven into a dynamic, ever-shifting collective record.
+	3	DWTC Clubhouse Archive: A polished, content-centric digital “home base” for the DWest Track Club—a permanent archive and vibrant club community space where DWTC’s lore, routes, and rituals are treasured, stories and photos are easily contributed, and the rich, evolving history of the club is built together.
+V1 also includes a robust library, shop, and foundational scaffolding for future AI and deep club functionality. Every touchpoint strengthens the pillars of creative expression, community identity, and club belonging.
+
+Purpose
+Core Purpose:
+	•	Expressive Discovery: Draws runners into the brand with a creative, emotionally resonant homepage and clear, motivating calls to action.
+	•	Motivational Community Participation: The Flow and clubhouse foster honest, creative contributions, making every runner feel seen.
+	•	Lasting Club Belonging: The DWTC Clubhouse becomes the digital home base and archive—a place where club stories live on, members can easily contribute, and the community’s journey is always visible and accessible.
+DWTC Clubhouse, Specifically:
+	•	The Clubhouse is the digital archive and gathering place for DWest Track Club (DWTC), where the crew’s lore is preserved—routes, race recaps, rituals, memories, and resources.
+	•	Its main jobs:
+	1	Provide DWTC members a clean, inspiring destination to catch up and see what’s happening.
+	2	Make it dead simple for any member to add stories, photos, or documents—catalyzing participation.
+	3	Create a permanent, browsable living record for the crew’s past, present, and emerging story.
+
+Target Audience
+	•	Expressive Runners: Drawn to both community expression and personal reflection via homepage and interactive canvas.
+	•	DWTC Club Members: Frequent contributors and consumers of the clubhouse, eager to build collective lore and enjoy club resources.
+	•	Shoppers: Enticed by the shop, but often converted by exposure to expressive, community-driven stories.
+	•	Curious Visitors: Those who land on the site looking for belonging, motivation, or inspiration.
+
+Expected Outcomes
+Tangible Outcomes
+	•	Strong engagement with homepage narrative and CTAs.
+	•	Active, creative submissions on the “Why You Run” canvas.
+	•	Frequent DWTC Clubhouse uploads—stories, media, and resources—catalyzed by low-friction contribution flows.
+	•	Measurable signups and deepening of club and community engagement.
+Intangible Outcomes
+	•	Runexpression is recognized as a unique, creative hub—distinct from typical running sites.
+	•	The DWTC Clubhouse becomes a source of club pride, inspiring ongoing contribution.
+	•	The foundation for AI Coach and future features is deeply seeded into community and club mechanics.
+Key KPIs
+Metric
+Short-Term Goal (V1)
+Long-Term Target
+Homepage CTA Engagement
+>35% scrolls/clicks
+>50% (personalized offers)
+Canvas Submissions
+300+ in 6 months
+1,500+ unique entries
+Clubhouse Uploads
+200 member uploads
+1,000+ in archive
+Other (Shop, etc.)
+As previously defined
+As previously defined
+
+Design Details
+DWTC Clubhouse: Information Architecture
+	•	Top-Level Route: /club/dwtc (auth-gated)
+	•	Core Sections:
+Section
+Description
+Overview
+Hero band with visual energy (club photo), a brief, celebratory story about DWTC, and carousel of newest/featured contributions.
+Lore & Stories
+Club archives: stories, race/workout recaps, rituals. Card-based, curated, easily browsable and filterable.
+Media Archive
+Tile/masonry gallery of photos and videos. Tag filters (race, workout, social, road, etc.), with hover/tap states for captions.
+Resources
+Grid/list of club docs (training plans, maps, PDFs). Clearly labeled, with file-type icons and summary descs.
+Contribute
+Unified “Add to the Archive” interface. Major CTA (e.g., top-right and/or persistent), plus inline prompts in Lore, Media, etc.
+	•	Navigation: Clean club-customized nav bar or sidebar, persistent “Add to Archive” button.
+DWTC Clubhouse: UI & Visual Language
+	•	Visual Style: Aligns tightly with homepage and canvas (“lab / tribe / lore” energy). Hand-drawn accents, gritty/unique card edges, non-corporate color palette, DWTC-specific color burst and club/crew photography.
+	•	Motion: Subtle slide/fade-in for contributions, interactive hover/tap animations, and carousel transitions in overview.
+	•	Language: “Sage in the parking lot”—deep but clear, warm, stories-first. Microcopy emphasizes tribe, lore, and inclusion:
+	•	“This is where the DWTC story lives.”
+	•	“Miles turn into memories here.”
+	•	“Add your chapter.”
+
+Clubhouse UX Flows: Member Contributions
+Entry Points
+	•	Primary CTA: "Add to the Archive" button, visually distinct, always available from core clubhouse pages.
+	•	Inline Prompts: E.g., “Have a story from this race? Add yours.” in Lore & Stories, or “Captured a great route shot?” in Media Archive.
+Contribution Flow
+	1	Step 1 – Choose Type
+	•	Options: Story, Photo/Video, or Document.
+	2	Step 2 – Input Details
+	•	Story: Title, short body text, optional attachment (image/video), tags (race, location, “vibe”), date.
+	•	Photo/Video: Drag-and-drop or click-to-upload (Supabase Storage), short caption (required), tags, event/date.
+	•	Document/PDF: File upload, title, description, tags (e.g., “Training Plan”, “Route Map”).
+	3	Step 3 – Attribution
+	•	Default: logged-in user’s club profile. Optional: allow nickname override (never full anonymity in the clubhouse).
+	4	Step 4 – Review & Submit
+	•	Preview card—shows how the entry will look, check all details.
+	•	Confirm and submit.
+	5	Step 5 – Confirmation
+	•	Success message—e.g., “Your story just joined the DWTC archive.”
+	•	Contextual link to where the contribution will live (“See it in Lore & Stories once approved”).
+Moderation & Approval
+	•	All contributions are created with moderation_status = pending in metadata.
+	•	Once approved, they are instantly discoverable in their respective sections (Lore, Media, etc.).
+
+Clubhouse: Browsing & Viewing Experience
+Section
+Layout & Details
+Overview
+Full-width hero band (club photo, candid moment, or collage), brief club intro/copy, carousel of recent contributions (story thumbnails/media cards).
+Lore & Stories
+Card-based layout, text-focused entries with small media thumbnails. By default, sort by newest; filters for tag, event, year.
+Media Archive
+Structured grid/masonry, with the brand’s “artistic, imperfect” tiles, subtle shadow/hand-drawn edge effects. Hover/tap displays captions and contributor. Tag and event filters up top.
+Resources
+List/grid—compact, clear icons for PDFs/images, short descriptions. Highly scannable, focus on utility.
+Contribution Surfaces
+Any section may feature context-aware prompts and buttons to drive new member contributions, reinforcing the living nature of the archive.
+
+Data Structures and Algorithms
+Table: club_contributions
+This is the DWTC-focused parallel to the generic expression_events. Core schema for V1:
+Field
+Type
+Description
+id
+UUID, PK
+Primary key
+club_id
+UUID, FK
+Reference to DWTC in clubs table
+user_id
+UUID, FK
+Linked to user or member profile
+type
+ENUM
+'story', 'media', 'document'
+title
+TEXT
+Title (required for stories/docs, optional for media)
+body
+TEXT
+Story text or description (nullable for media entries)
+media_url
+TEXT
+Supabase Storage URL (images/videos)
+doc_url
+TEXT
+Supabase Storage URL (documents/PDFs)
+tags
+ARRAY/TEXT or JSONB
+Tags (race, workout, vibe, event, custom)
+metadata
+JSONB
+{ event_name, event_date, location, moderation_status, featured_flag }
+created_at
+TIMESTAMP
+Timestamp
+is_public
+BOOLEAN
+Visibility status
+	•	Moderation: metadata.moderation_status tracks pending/approved/rejected.
+	•	Attribution: User information (never fully anonymous) tied to member identity. Optionally display nickname, but no “guest/anon” state.
+	•	AI Coach Future: Can join with user profiles, training data, and club activity later for holistic AI context.
+Storage & Retrieval
+	•	Media/Document Uploads: Files go to Supabase Storage; media_url and doc_url fields store their public URLs.
+	•	Contribution Endpoints:
+	•	CreateClubContribution(user, club, payload)
+	•	ListClubContributionsByClub(club, filters)
+	•	ListFeaturedClubContributions(club)
+	•	Browsing & Filtering: Tag- and metadata-based queries, default sorted by created_at DESC, with optional spotlight of featured content.
+
+System Interfaces
+Clubhouse Backend/API
+	•	Media Handling: Uploads via authenticated endpoints to Supabase Storage. Client receives presigned upload URLs.
+	•	Contribution Posting: New contributions POST to /api/club_contributions/create, which validates, writes reference to DB, and returns for moderation.
+	•	Moderation: Uses metadata.moderation_status. Default “pending”; review and approve via admin/club lead dashboard.
+	•	Browsing APIs: /api/club_contributions/list?club=...&type=...&tag=... for various archive tabs and filters.
+	•	Identity Linking: All posts associated to a verified club member; no truly anonymous Clubhouse submissions.
+Homepage + Canvas Alignment
+	•	Homepage teaser block features a direct, branded link to /club/dwtc, referencing lore, rituals, and the energy of the crew. The Clubhouse visually and experientially delivers on this promise by being highly browsable, motion-rich, and easily navigable.
+	•	Core visual and card/audio patterns are reused and adapted; only club-specific accents/colors/photography differentiate DWTC from core Runexpression sections.
+	•	Future: V2 may surface a club-specific canvas Flow (filtered subset of expression_events relevant to DWTC members/events).
+
+User Interfaces
+Clubhouse UI & Flows
+Core Layout
+Section
+Key Features
+Overview
+Hero image, club intro, new contributions carousel, and key event teaser.
+Lore & Stories
+Editor-curated cards (story-focused, text+media), filters for tags/events, “Add a Story” calls to action.
+Media Archive
+Gallery grid (structured, “gritty” brand card styles), filter bar for tags/events, hover/caption details.
+Resources
+File-type grid/list, clear download and details, visible “Add Resource” button for trusted/upload-enabled users.
+Contribution Surfaces
+Persistent “Add to Archive” CTA and inline inviting prompts.
+Contribution UX
+	1	Launch Contribution: Via all-sections CTA or direct "Contribute" page.
+	2	Choose Card: Select Story, Photo/Video, or Document.
+	3	Input Form:
+	•	Story: Title, body, optional media, tags, event/date.
+	•	Media: Upload, caption, tags, event/date.
+	•	Document: Upload, title, description, tags.
+	4	Attribution: Pre-fills logged-in member; optional nickname override; no full anonymity allowed.
+	5	Preview & Confirm: Shows card as it will appear; facility to edit or confirm.
+	6	Submit & Feedback: Delightful, on-brand confirmation (“Your story just joined the archive”), animated feedback, and direct link to contribution location.
+Browsing UX
+	•	Tiles/Cards: Gritty, hand-embellished edges, team color highlights, photos or thumbnails, contributor attribution, subtle microinteractions (fade/slide-in, hover pop).
+	•	Overview Carousel: Motion mirrors homepage/canvas—tiles gently animate and invite deeper dive.
+	•	Filter & Search: Lore & Media easily filtered by tag, year, event—quick access to major club themes, traditions, and moments.
+Design Language & Motion
+	•	Unified Visual Grammar: Core components and motion borrowed from homepage/canvas—expressive, artistic, energetic.
+	•	Color & Photography: DWTC colors and candid/crew images distinguish the Clubhouse while using shared global frames, hand-drawn overlays, “imperfect” cards.
+	•	Language: Celebratory, accessible, deep but grounded—mirroring “Sage in the parking lot” energy.
+
+AI Coach Hooks
+	•	All club_contributions have structured links to user profiles, events, and tags, enabling the future AI Coach to contextualize a runner’s community connection, event history, and qualitative memories.
+	•	The metadata JSONB supports future extensions (structured performance data, narrative “highlights,” links to sessions), so AI can reference club lore, event recaps, and resources.
+	•	Clubhouse flows and community archives double as ground truth and memory bank for deep, personalized AI engagement.
+
+
+This technical specification details how the DWTC Clubhouse aligns deeply with homepage and canvas experiences, balancing community expression, ease of contribution, powerful browsing, and lasting, richly storied digital belonging. All core flows, data models, interface guidelines, and brand cues are structured for seamless end-to-end build and future expansion.
+
+
+—-
+
+Appendix
+
+—-
+
+Homepage 
+Hero: Make running mean more.
+Sub-line: Turn your struggle into art and feed the running community with your story.
+How this plays out on the homepage:
+	•	First viewport is almost all about these two lines. Clean, high-contrast typography, subtle background motion that hints at the Flow, and one clear primary CTA: “Enter the Flow.”
+	•	As the user scrolls, we start layering in chunks of the Expressive Runner’s Creed with imagery/interaction, each section tying back to a pillar: motion creates emotion, process over outcome, tribe as performance enhancer, interdependence over independence.
+	•	Midway down, we surface a small live strip of recent canvas entries (“the flow”) to make that sub-line literal.
+	•	Further down, we tease the DWTC Clubhouse with copy that echoes “we vs the struggle” and the tribe energy.
+Page Details
+	•	The hero copy:
+	◦	H1: “Make running mean more.”
+	◦	Sub: “Turn your struggle into art and feed the running community with your story.”
+	◦	Primary CTA: “Enter the Flow” → canvas
+	◦	Secondary CTA: “Visit the Clubhouse” → DWTC hub
+	•	A clear section-by-section homepage structure:
+	◦	Hero (text-first, minimal motion, CTA focus)
+	◦	Manifesto “chapters” tied to your pillars (Interdependence, Process over Outcome, Motion Creates Emotion, Tribe as Performance Enhancer), each with short copy + imagery + a soft prompt.
+	◦	Flow preview strip/mosaic powered by expression events.
+	◦	DWTC Clubhouse teaser block (image + small story + CTA).
+	◦	Footer invite with “Run for yourself. Run for us. Express yourself.” plus key links.
+	•	Concrete implementation notes for you/dev: layout behavior on desktop vs mobile, where to use scroll-triggered reveals, how the Flow strip behaves (scrollable/auto-scrolling tiles sourced from expression_events), and how the Clubhouse teaser should visually stand out but still feel part of the same “lab.”
+	•	Explicit callouts that all of this is derived from:
+	◦	The Expressive Runner’s Creed
+	◦	Brand pillars (motion creates emotion, process over outcome, tribe)
+	◦	“Living laboratory” idea → via Flow preview and contribution invitations
+	◦	Voice = “Sage in the parking lot” (deep but accessible, serious but light, invitational)
+You can now hand that doc to a designer/dev and they’ll know: section order, copy anchors, interaction level, and where data/UGC ties in.
+
+—-
+“Why You Run” interactive canvas 
+Purpose and role The doc calls out the canvas as the main embodiment of the Expressive Runner’s Creed: a living wall where people answer “What did your run express today?” in different mediums, and their pieces immediately join the Flow that’s previewed on the homepage and fully visible on the canvas page.
+	1	UX flow (end to end) The updated spec walks through:
+	•	Entry points: hero CTA “Enter the Flow,” the Flow preview strip on the homepage, and main nav.
+	•	Prompt screen: repeats the question plus a reassuring helper line like “It doesn’t have to be pretty. Just honest.”
+	•	Medium selection: V1 explicitly supports Text and Image Upload; a simple drawing pad is noted as V1.1/V2.
+	•	Input UIs:
+	◦	Text = short phrase focus with optional longer note.
+	◦	Image = drag/drop or click upload + caption.
+	•	Identity behavior: anonymous/pseudonymous allowed, but expressions are attached to profile when logged in.
+	•	Submission feedback: confirmation like “Your run just joined the Flow,” plus animation of the new tile drifting into the wall and clear options to: see the wall, share, or sign up/log in (future AI Coach hook).
+	3	Canvas viewing experience The document defines the main canvas page as:
+	•	A full-screen or near-full-screen mosaic/stream (not a rigid grid) of tiles that gently move/shift to feel like “flow.”
+	•	Minimal, readable metadata on each tile: snippet/image + optional first name/handle.
+	•	Optional “All vs. Just mine” toggle for logged-in users; media filters are noted as a later enhancement.
+	4	Data model and storage Under Data Structures and Algorithms, you now have a concrete expression_events table:
+	•	id, user_id (nullable), medium (text/image/drawing), content_text, media_url, metadata (JSONB with mood, tags, run_distance, moderation_status, etc.), created_at, is_public.
+	•	Notes on using Supabase Storage for media, and tying expression_events back to future AI Coach context (user_id + timestamps + run context).
+	5	System interfaces and moderation The System Interfaces section now covers:
+	•	How the front end talks to Supabase for create/read of expression events.
+	•	Using Supabase Realtime (or polling) so new tiles appear without reload.
+	•	A simple moderation flag in metadata (pending/approved/rejected) and the expectation of a light admin review surface (or using the Supabase dashboard initially).
+	6	UI and brand alignment In User Interfaces, the canvas is now described visually:
+	•	Gritty, artistic tiles with slightly imperfect edges, hand-drawn accents, non-corporate colors.
+	•	Constant but subtle motion (drift, fade-in, tiny jitter) so it feels like a living organism, not a static gallery.
+	•	Empty state seeded with clearly-labeled sample expressions from Runexpression plus a bold invite to “be the first to add yours.”
+	7	Homepage connection and AI hooks The spec makes explicit that:
+	•	The homepage Flow preview strip is just “latest N approved expression_events,” so implementation is one data source, two views.
+	•	Phrases like “Make running mean more” and “Run for yourself. Run for us. Express yourself.” are reused in key spots on the canvas page for continuity.
+	•	expression_events is deliberately AI-ready: JSONB can later hold run_context, perceived_effort, mood, etc., without needing a breaking schema change.
+Practically, you can now:
+	•	Hand this doc to your dev as the single source of truth for building the canvas backend, API usage, and front-end UX.
+	•	Share the Design Details + User Interfaces sections with a designer so they know section layout, motion level, and brand constraints.
+—-
+DWTC Clubhouse 
+Information architecture (inside Design Details / User Interfaces) The clubhouse is now defined as the digital home base for DWTC at something like /club/dwtc, behind auth. Inside it, the doc spells out:
+	•	Overview: hero band with a big DWTC image, a short “who we are” story, and one highlighted upcoming thing (race, workout, ritual).
+	•	Lore & Stories: cards for race recaps, workout writeups, traditions; text-forward with supporting media and filters by tag/year/event.
+	•	Media Archive: a gallery of photos and videos in that same gritty / artistic card style you’re using for the Flow, but a bit more structured.
+	•	Resources: grid/list of PDFs and docs (training plans, routes, guides) with clear titles and descriptions.
+	•	Contribute: a unified “Upload your story” surface, plus inline prompts that invite people to add to specific sections.
+Member upload flows The UX for contributions is now fully laid out:
+	•	Entry points: a visible “Add to the Archive” button across clubhouse pages, plus inline “Add yours” prompts under stories/media sections.
+	•	Flow:
+	◦	Choose type: Story, Photo/Video, or Document.
+	◦	Fill details:
+	▪	Story = title, short body, optional media, tags, date.
+	▪	Photo/Video = upload + caption + tags/date.
+	▪	Document = upload + title + description + tags.
+	◦	Attribution: always tied to the logged-in member profile (no anonymous in the clubhouse), with optional nickname override.
+	◦	Review & submit: preview card, then confirmation like “Your story just joined the DWTC archive,” with a link to where it’ll appear after approval.
+Data + system side Under Data Structures / System Interfaces, you now have:
+	•	A club_contributions table spec with fields for club_id, user_id, type (story/media/document), title/body, media/doc URLs, tags, metadata (event info, moderation_status, featured_flag), created_at, is_public.
+	•	Notes that club_contributions parallels expression_events but is club-scoped and non-anonymous.
+	•	Supabase Storage for media/docs; basic service methods sketched (create/list/list-featured).
+	•	Moderation via metadata.moderation_status with only approved content surfacing by default.
+Visual and voice alignment For the UI:
+	•	The clubhouse reuses the “lab / tribe / lore” aesthetic: hand-drawn accents, imperfect cards, non-SaaS colors. DWTC gets its own personality via photos and color accents, but it still feels like part of the same world as the homepage and Flow.
+	•	Motion is subtle: fade/slide-in for cards, small hover/tap animations.
+	•	Microcopy stays “Sage in the parking lot”: lines like “This is where the DWTC story lives,” “Miles turn into memories here,” “Add your chapter.”
+Connections to homepage and canvas The doc also calls out:
+	•	The homepage Clubhouse teaser promises lore/rituals/crew energy; the clubhouse design is explicitly built to deliver that (visually rich, easy to browse, full of member contributions).
+	•	Future option to show a mini Flow subset inside the clubhouse, filtered by DWTC-related expression_events.
+	•	AI Coach hooks via club_contributions + metadata for later training/context.
+From here, you can hand this same doc to design and dev and they’ll have:
+	•	Homepage spec
+	•	Flow/canvas spec
+	•	DWTC Clubhouse spec
+All wired to the same brand, stack, and future AI Coach needs.
 
 
 ## Runexpression Website (V1) – Technical Specification & Project Plan Addendum
