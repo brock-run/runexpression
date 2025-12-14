@@ -52,3 +52,119 @@ Option C: The "Digital Bacon" (Gratitude Log)
 	•	The Interaction: Users upload a photo or a note about the post-run moment. The coffee, the view, the high-five, the meal. No watch screenshots allowed. No pace stats.
 	•	The Payoff: A visual feed that celebrates the process and the lifestyle rather than the metrics.
 	•	Goal: shifts the focus immediately from Performance to Experience.
+
+Homepage Content
+
+	•	 The Vibe: "The Sage in the Parking Lot." Deep, spiritual, but gritty and willing to laugh at the absurdity of the sport.
+	•	The Shift: Moving from Independence (Me vs. Clock) to Interdependence (We vs. Struggle).
+	•	The Goal: A homepage that isn't just a brochure, but an "interactive mirror" (The Flow) that invites the user to co-create immediately.
+
+Narrative:
+	•	1. Mental Shift: Leave heavy. Return light. (Motion Creates Emotion)
+	•	2. Values: The medal gathers dust. The feeling lasts. (Process Over Outcome)
+	•	3. Connection: We vs. The Struggle. (Interdependence)
+	•	4. Energy: Your squad is your battery pack. (Tribe as Enhancer)
+	•	5. Lifestyle Application: The run is just the studio. (The Living Laboratory)
+Emotion:
+	•	1. Deep/Relatable: Leave heavy. Return light. (Motion Creates Emotion)
+	•	2. Self-Deprecating/Fun: We take our fun very seriously. (Process Over Outcome)
+	•	3. Connection: We vs. The Struggle. (Interdependence)
+	•	4. Energy: Your squad is your battery pack. (Tribe as Enhancer)
+	•	5. Real/Witty: Enlightenment smells like laundry. (The Living Laboratory)
+	•	
+
+
+Below is the full homepage copy, structured for implementation.
+
+Homepage Copy: Run Expression
+
+Section 1: Hero (The Hook)
+
+	•	Visual Direction: Clean, high-contrast typography. Subtle background motion (like a slow-shutter street scene or flowing abstract lines). The focus is entirely on the words.
+	•	H1: Make running mean more.
+	•	Sub-headline: Turn your struggle into art and feed the running community with your story.
+	•	Primary CTA (Button): Enter the Flow (Links to the Kinetic Canvas anchor)
+	•	Secondary CTA (Link): Visit the Clubhouse (Links to DWTC Hub)
+
+Section 2: The Pillars (Manifesto Chapters)
+
+Visual Direction: As the user scrolls, these appear as "chapters." Minimalist imagery. Text is punchy. This breaks the "Expressive Runner’s Creed" into digestible bites.
+
+Chapter 01: Motion Creates Emotion
+
+	•	Headline: Leave heavy. Return light.
+	•	Body: We’ve all felt it. You lace up with a head full of noise, stress, and unfinished arguments. Three miles later, the noise settles. The problem that seemed impossible at 6:00 AM solves itself by mile four. We run to change our minds, not just our bodies.
+	•	Soft Prompt: [Explore the Mindset >]
+	•	Revised Chapter 01: Motion Creates Emotion
+	•	Goal: Ground the concept. Less "universe," more "Tuesday morning."
+
+Chapter 02: Process Over Outcome
+
+	•	Goal: Acknowledge the absurdity of the sport. We choose to suffer, which is funny.
+	•	Headline: We take our fun very seriously.
+	•	Body: Let’s be honest: in the grand scheme of the universe, running in circles is ridiculous. We pay to wake up at 4 AM. We obsess over split times nobody else cares about. We don't run because it's "logical." We run because the bagel tastes better when your legs are dead.
+	•	Soft Prompt: [Embrace the Grind >]
+	•	Alternative
+	◦	Headline: The medal gathers dust. The feeling lasts.
+	◦	Body: We honor the struggle, not just the split times. We know that a 12-minute mile hurts just as much as a 5-minute mile, and they both deserve a cold beer at the finish.
+	◦	Soft Prompt: [Embrace the Process >]
+
+Chapter 03: Interdependence
+	•	Headline: Your squad is your battery pack.
+	•	Body: Science confirms what the gut already knows: We go farther when we go together. The runner next to you isn't your competition; they are the reason you’ll hold that pace for one more mile when your legs want to quit. We draft off each other’s energy.
+	•	Soft Prompt: [Find Your Crew >]
+Chapter 04: Living Laboratory
+	•	Focus: Running as the "studio" for life. How we do one thing is how we do everything.
+	•	Goal: Keep the "Life/Studio" connection, but ground it in the messy reality of being a runner.
+	•	Headline: Enlightenment smells like laundry.
+	•	Body: We run to find clarity, patience, and creativity that we can bring back to our "real lives." Does that make us artists? Yes. Does it also mean we have the questionable toenails of a warrior poet? Also yes. The run is where we scrub the stress off our souls (even if we need a shower immediately after).
+	•	Soft Prompt: [Bring It to Life >]
+	•	Alternative
+	◦	Headline: The run is just the studio.
+	◦	Body: We don’t just run to burn calories; we run to ignite our minds. The patience learned on a long run? That’s for your family. The grit from a hill repeat? That’s for your career. We treat the pavement as a place to sharpen our creative tools, so we can build a better life the moment the watch stops.
+	◦	Soft Prompt: [Bring It to Life >]
+
+Section 3: The Flow (The "Mirror")
+
+	•	Visual Direction: This is the "Option A: Kinetic Canvas" implementation. A live, side-scrolling or floating mosaic of words submitted by other users. It feels alive.
+	•	H2: What are we running for today?
+	•	Sub-headline: You are not alone on the road. Add your intention to the stream.
+	•	Interaction Module:
+	◦	Input Field Text: Today, I ran for... [ Type your word here ]
+	◦	 Button: Add to the Flow
+	•	Live Feed Visual (The Stream):
+	•	(Simulated examples scrolling by)
+	•	> Sanity... The Bacon... My Sobriety... The Sunrise... Silence... My Mom…> 
+
+Section 4: DWTC Clubhouse Teaser
+
+	•	Visual Direction: A shift in aesthetic. Slightly more "exclusive" or "club" feeling. Gritty photography (black and white, high grain).
+	•	H2: Welcome to the Laboratory.
+	•	Body: The Clubhouse is where the "Sage in the Parking Lot" lives. It’s where we swap stories, dissect the process, and remind each other that while running is absurd, it’s also essential.
+	•	Callout: This is an invitation. Not to run faster, but to run deeper.
+	•	CTA: Visit the Clubhouse
+
+Section 5: Footer
+
+	•	Visual Direction: Simple, clean, grounded.
+	•	Headline: Run for yourself. Run for us. Express yourself.
+
+Navigation:
+ * The Manifesto
+ * The Flow
+ * The Studio
+ * The Shop (Coming Soon)
+ * Login / Join
+
+Social Links: [Icons]
+
+Copyright: © 2025 Run Expression. All rights reserved.
+
+Implementation Notes for Your Dev Team
+	•	 Mobile vs. Desktop:
+	◦	Hero: On mobile, stack the buttons vertically. Ensure "Enter the Flow" is the thumb-reachable priority.
+	◦	The Flow (Section 3): On desktop, this can be a horizontal auto-scroll. On mobile, consider a touch-swipeable carousel so it doesn't hijack the vertical scroll of the page.
+	•	Scroll-Triggered Reveals: Use "Scrollytelling" for Section 2 (The Pillars). As the user scrolls down, fade in the Headline first, then the Body. Keep the background static or slowly shifting to maintain focus on the text.
+	•	The Flow Logic: The "Input Field" needs to feel instant. When a user submits, their word should immediately animate into the "Live Feed" visual to give instant gratification (rewarding the co-creation).
+
+
