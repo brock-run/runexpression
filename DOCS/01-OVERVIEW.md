@@ -126,6 +126,12 @@ RunExpression V1 is deliberately architected to share the same technical DNA as 
 - ✅ Seed content for blog and clubhouse
 - ✅ Visual design system (typography, colors, motion)
 
+**Additional**
+- Strava integration for runners
+- Newsletter/email automation (ConvertKit/Mailchimp)
+- Comments on blog posts
+- User profiles (public vs. private data)
+
 ### OUT OF SCOPE for V1 (Deferred to V1.1+)
 
 - ❌ Advanced sticker composition studio (Fabric.js integration)
@@ -137,13 +143,6 @@ RunExpression V1 is deliberately architected to share the same technical DNA as 
 - ❌ Multiple club support (DWTC only for V1)
 - ❌ Native mobile apps
 - ❌ Complex gamification ("The Long Run" game)
-
-### MAYBE for V1 (Evaluate During Build)
-
-- 🤔 Strava integration for runners
-- 🤔 Newsletter/email automation (ConvertKit/Mailchimp)
-- 🤔 Comments on blog posts
-- 🤔 User profiles (public vs. private data)
 - 🤔 Calendar/events management system
 
 ---
