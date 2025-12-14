@@ -77,6 +77,271 @@ Phase 4: Polish & Launch (Week 6)
 	•	End-to-End testing of the "New User" vs. "Trusted User" flow.
 	•	Load testing the Realtime subscription for the Wall.
 
+## Runexpression Website – Technical Design & Project Plan
+
+Product Overview
+The Runexpression website is conceived as the expressive home for runners and the initial platform for launching the AI Coach product. At its core, the V1 experience is anchored around three critical user journeys:
+	1	Creative, Experimental Homepage: A visually engaging, slightly experimental landing page that weaves the brand's manifesto into an interactive or motion-driven flow, culminating in a strong primary call to action (CTA).
+	2	“Why You Run” Interactive Canvas: An inspiring, communal canvas allowing users to express themselves richly—submitting text, images, and possibly simple drawings—directly onto a digital wall. The experience is designed to be easy and motivating, going beyond simple input forms.
+	3	DWTC Clubhouse Archive: A polished, content-forward clubhouse for members, featuring intuitive navigation of rich club resources (images, videos, lore, PDFs), and a key interactive capability for members to upload and permanently archive their own stories and media.
+Beyond these, V1 retains a robust library, shop, and tooling, with clear technical scaffolding for progressive, AI-powered features and deeper club management. The aim is to activate key engagement around these three brand-defining touchpoints, and establish strong foundations for seamless future AI integration.
+
+Purpose
+Core Purpose:
+The site brings the Runexpression philosophy to life through three main brand and community experiences:
+	•	Expressive Discovery: The homepage invites users into the brand, delivering the manifesto through creative storytelling mechanisms and a compelling CTA.
+	•	Motivational Community Participation: The interactive canvas motivates runners to be seen and heard, lowering friction for adding meaningful, creative contributions to a growing communal wall.
+	•	Lasting Club Belonging: The DWTC Clubhouse archives the evolving story of the club, enabling rich browsing of lore and resources, and empowering members to permanently contribute their own artifacts.
+Purposeful Solutions:
+	•	An identity-driven alternative to standard running sites, made tangible through the manifesto experience.
+	•	Immediate digital belonging for club members via uploads and archival features.
+	•	Laying technical/persona groundwork for the AI Coach: shared profiles and data, ready to surface personal and communal content.
+
+Target Audience
+	•	Expressive Runners: Motivated by creative self-expression and community affirmation, core users of both the homepage and interactive canvas.
+	•	Club Members: Frequent contributors and consumers of clubhouse resources, engaged in story-building and resource sharing.
+	•	Shoppers: Attracted by shop and exclusive releases, but also drawn into the brand narrative via the homepage experience.
+	•	Curious Visitors: Invited to deepen engagement through the signature homepage CTA and welcoming community experiences.
+The site’s core experiences—homepage, canvas, and clubhouse—are designed to speak directly to these audiences, whether they arrive out of curiosity, intent to belong, or desire for creative participation.
+
+Expected Outcomes
+Tangible Outcomes
+	•	High interaction with the manifesto flow and homepage CTA (click-through, scroll depth).
+	•	Active contributions to the “Why You Run” canvas (submissions, time spent, revisits).
+	•	Member engagement with clubhouse content and peer-uploaded media.
+	•	Growth in signups, subscriptions, and club memberships, especially among expressive runners.
+Intangible Outcomes
+	•	Strong, distinctive brand identification around creativity and inclusion.
+	•	Cultural credibility and momentum for the communal archive/wall.
+	•	Smooth route for onboarding users into AI Coach through content and identity hooks.
+Key KPIs
+Metric
+Short-Term Goal (V1)
+Long-Term/AI Coach-Ready
+Homepage CTA Engagement
+>35% scrolls/clicks
+>50% (personalized offers)
+Canvas Submissions
+300+ in 6 months
+1,500+ unique stories
+Clubhouse Uploads
+200 member uploads
+1,000+ in media archive
+Shop/Newsletter
+As previously defined
+As previously defined
+Activation and retention along the three core flows are the main evaluation criteria for launch.
+
+Design Details
+Information Architecture
+	•	Homepage: Features the creative, motion-enhanced expression of the manifesto, tightly coupled with a clear, prominent CTA (“Join the Expression,” “Contribute Your Story,” etc.).
+	•	Interactive Canvas (“Why You Run” Wall): Standalone, immersive section accessible from homepage and main nav; wall displays a flowing mosaic of contributions (text, image, drawn), updated in real time or near real time.
+	•	DWTC Clubhouse: Member-authenticated area with structured navigation and visual storytelling—clearly organized resource cards (images, videos, lore, PDFs), and a permanent media upload feature.
+Additional
+	•	Library and Shop remain, but as supporting rather than primary V1 experiences.
+Content Strategy
+	•	Manifesto woven into creative UI elements (scroll-driven reveal, overlays, or subtle animation).
+	•	Inspirational copy and visual storytelling in all three core experiences.
+	•	All member-submitted media stored and surfaced with attribution, with moderation controls.
+	•	Modular, extensible content (MDX, dynamic wall “tiles,” etc.).
+UX Flows
+	•	Homepage: Interactive scroll or motion cues draw users through the manifesto; a sticky or creatively surfaced CTA remains persistent and visible.
+	•	Canvas Submission: Low friction, high delight—clear input, instant feedback, community affirmation (e.g., see your contribution instantly on the wall).
+	•	Clubhouse Browsing/Uploading: Easy-to-navigate, visually rich; single upload interface for member media with confirmation and archival feedback.
+Integration with Brand Philosophy
+	•	All three experiences reflect “radically expressive running”: motion, color, participatory UI.
+	•	Community affirmation is prioritized—user expressions and uploads are persistent, celebrated, and easily browsable.
+
+Architectural Overview
+Stack (remains as previously outlined):
+	•	Frontend: Next.js (React)
+	•	Backend: Supabase (Postgres + Auth + Storage)
+	•	Content: MDX + user-generated content (UGC)
+	•	Payments: Stripe
+New/Expanded V1 Patterns:
+	•	Home/manifesto UI uses modular animation (e.g., Framer Motion or CSS transitions) for progressive reveal without high complexity.
+	•	Canvas and clubhouse uploads via Supabase Storage, with JSONB-rich metadata for extensibility.
+	•	Real-time (or near real-time) content reflectivity using Supabase Realtime subscriptions or polling.
+	•	All user-generated expressions and uploads linked to unified user IDs for AI Coach future compatibility.
+Component Communication:
+	•	Manifesto, canvas, and clubhouse all leverage shared user profile/auth data.
+	•	Clubhouse and canvas both use similar interfaces for upload, rendering, and moderation, ensuring maintainability and reusability.
+Architecture Diagram (update):
+Layer
+Key Services
+Notes
+Presentation
+Next.js (SSR, static)
+Shared surfaces for manifesto, canvas, clubhouse
+Content/API
+Supabase REST, Realtime
+MDX, canvas events, club member uploads, moderation
+Data Storage
+Supabase Postgres
+users, expression_events, club_contributions
+Media Storage
+Supabase Storage
+Uploads for images, PDFs, videos
+
+Data Structures and Algorithms
+Key Tables & Relationships
+Table
+Purpose
+Key Fields
+users
+Auth, identity, role, profile
+auth_id (PK), email, profile, club, archetype, settings (JSONB)
+content_library
+Editorial/curated content
+id (PK), title, slug, mdx_body, tags, author, published_at
+expression_events
+“Why You Run” canvas submissions
+id (PK), user_id (FK), content (JSONB), media_urls (ARRAY), created_at, status (moderation), metadata
+club_contributions
+Clubhouse member uploads (archive)
+id (PK), user_id (FK), type (image, video, PDF, story), media_url, metadata (JSONB), created_at, status
+products
+Shop
+id (PK), name, description, price, images, active
+orders
+E-commerce
+id, user_id, product_ids, status, stripe_session_id
+clubs
+Club hub, membership
+id, name, description, member_ids, resources (ARRAY), exclusives
+Additional Details
+	•	expression_events: JSONB stores text, drawing data (SVG?), image URLs; moderation fields for curation and flagging.
+	•	club_contributions: Flexible type and JSONB allow for club-member uploads of any media, attributed and queryable by member, event, or type.
+	•	Both tie directly to user_id for personalization and future AI/analytics readiness.
+Notable Algorithms & Patterns
+	•	Canvas Stream: New events pushed onto wall mosaic in real time. Simple pub/sub or polling pattern; future: enhanced clustering or AI-driven surfacing.
+	•	Moderation/Review: Admin view flags new “expressions” or “contributions” for quick approve/decline; supports future semi-automated moderation.
+	•	Upload Deduplication: Basic hash check to prevent spam/duplicate content in club and canvas submissions.
+
+System Interfaces
+User and Admin Flows
+	•	Homepage: Hybrid static/SSR page; motion modules fetch manifesto content at build, animations via Framer Motion/CSS.
+	•	Canvas Submission: Authenticated (optionally anonymous) input (text, rich image upload, simple SVG/Canvas drawing); entry immediately reflected on wall. All media handled by Supabase Storage with metadata in expression_events.
+	•	Clubhouse Upload: Authenticated club member submits images, docs, or stories; upload flow writes to club_contributions and storage; instant confirmation and appearance in archive.
+	•	Moderation: Admin panel lists unreviewed events/contributions with quick approve, reject, or flag; status field in both main tables.
+	•	Realtime Presentation: Wall/canvas and club archives auto-refresh via Supabase Realtime or timed polling for seamless multi-user updates.
+Third-party/Backoffice
+	•	Supabase SDK for storage, CRUD, and Realtime subscriptions.
+	•	Stripe webhooks for shop/club commerce.
+	•	Shared user IDs across all core tables for cross-surface personalization (and AI Coach hooks).
+AI Coach Integration Readiness
+	•	User auth and profile IDs unify all touchpoints.
+	•	All community/club expressions (canvas, clubhouse) captured in extensible, AI-compatible data tables with JSONB metadata.
+	•	Feature flags in system allow progressive activation of AI-driven features.
+
+User Interfaces
+Homepage (Creative/Experimental Manifesto)
+	•	Design: Non-traditional, visually expressive grid or vertical scroll revealing the manifesto, mixing static, animated, and staggered text/image with scroll-activated cues. Lightweight but creative effects (e.g., parallax, fade, highlight) enhance but do not block performance or accessibility.
+	•	CTA: One strong, visually anchored button (“Share Why You Run” / “Join the Archive” / “Become Expressed”) appears as a sticky or transitioning element, guiding users into key engagement surfaces.
+“Why You Run” Interactive Canvas
+	•	Design: Wall or flow-mosaic showing community contributions as cards/tiles; new posts appear in real/near real time. Submission interface supports:
+	•	Text input (with light formatting)
+	•	Image upload (drag/drop, mobile camera)
+	•	Optional: Simple browser drawing (SVG/Canvas, colored ink, touch)
+	•	Experience: Motivational copy, instant reflection of new submission, animation to highlight new/featured expressions, supportive prompts.
+	•	Moderation: Subtle status feedback (“pending approval” for new users, instant for trusted).
+DWTC Clubhouse (Content Archive)
+	•	Design: Content-heavy but polished resource hub. Clear side/top nav to club lore, guides, videos, and member stories.
+	•	Interactive Feature: Upload modal or dedicated section allows authenticated members to contribute images, stories, PDFs, or videos; uploads persist in the club archive.
+	•	Browsing: Visual storytelling; member uploads displayed alongside “official” club content, with filters and attribution.
+General Principles
+	•	All interfaces are responsive, accessible, and optimized for delight and immediacy through motion, surfaces, and color.
+
+Hardware Interfaces
+	•	Web-mobile/desktop first.
+	•	Responsive grid and gestures for canvas and clubhouse interfaces.
+	•	Touch support for drawing (if included on canvas), optimized image capture on mobile.
+	•	No native hardware integrations V1; future readiness for device hooks.
+
+Testing Plan
+Priority: Ensure smooth, delightful, and reliable flows across the three V1 anchor experiences.
+
+Test Strategies
+	•	Homepage: Test for animation/motion smoothness, correct manifesto sequencing, CTA stickiness/click-through, cross-device scroll behavior.
+	•	Canvas: Validate submission of all input types (text/image/drawing), instant wall update/reflection, moderation states, mobile image and drawing UX, and spam prevention.
+	•	Clubhouse: Test content navigation, upload and archival flows for all accepted media, member-only gating, upload status feedback; ensure uploads appear in archive promptly and accurately.
+	•	Accessibility: Motion/animation supports WCAG guidance (reduced motion support).
+	•	Robustness: Regression on critical library/shop/member flows.
+
+Testing Tools
+	•	Unit/Integration: Jest, React Testing Library.
+	•	E2E Automation: Playwright or Cypress, emphasizing homepage → CTA → canvas and clubhouse flows.
+	•	Accessibility: axe-core, focus on creative surfaces.
+	•	Performance monitoring: Vercel Analytics, Sentry.
+
+Testing Environments
+	•	Local: Full dev parity; motion/animation debugging support.
+	•	Staging: Vercel + Supabase preview with member/test accounts and sandboxed media uploads.
+	•	Production: Live environment, error logging, and alerting especially for content submission and moderation anomalies.
+
+Test Cases
+Critical User Journeys:
+	•	Homepage load/scroll → Manifesto fully revealed → CTA engaged → Canvas or Clubhouse entry.
+	•	Canvas: Submit text/image/drawing → See on wall (all devices) → Moderate new user submission.
+	•	Clubhouse: Member uploads media → Content appears in archive → Browsing/filtering by type and contributor.
+Functional Cases:
+Area
+Scenario
+Expected Outcome
+Homepage
+Animations trigger on scroll
+Manifesto smoothly revealed, CTA persistent
+Canvas
+Submit rich input
+Contribution appears on wall, feedback visible
+Canvas
+Upload inappropriate content
+Flagged for moderation, not auto-displayed
+Clubhouse
+Upload story/image/PDF
+Item visible in archive, proper metadata
+Clubhouse
+Archive browsing/filtering
+Navigation is clear, recent items surfaced
+Auth
+Member entry into Clubhouse
+Gated interface, upload possible
+
+Reporting and Metrics
+	•	Monitoring: Track engagement along homepage manifest/CTA, canvas wall additions, clubhouse archive uploads.
+	•	Error/Bug Tracking: Proactively surface issues in submission, moderation, and animation flows.
+	•	Weekly Reporting: Dashboard for creative experience engagement, new expressions, and member archive growth.
+
+Deployment Plan
+	•	Content, media, and feature gating for homepage, canvas, and clubhouse launches.
+	•	Critical readiness checks: homepage motion/animation, wall/club archive population, media upload functioning smoothly.
+
+Deployment Environment
+	•	As previously defined, with media storage and CDN performance validated on image/drawing-heavy flows.
+
+Deployment Tools
+	•	As previously defined; extra focus on Supabase Storage configuration, moderation/admin toggles for canvas and clubhouse features.
+
+Deployment Steps
+	1	CI Verification: Checks on rich interaction flows, moderation interfaces, upload & storage.
+	2	PR/Merge Workflows: All new features validated against core anchor experiences.
+	3	Smoke Test: Validate homepage experience/CTA, rapid upload/browse on both canvas and clubhouse.
+	4	Go-Live: All critical flows “green,” content seeded for wall/club archive.
+
+Post-Deployment Verification
+	•	Homepage, canvas, and clubhouse features functional and delightful across devices.
+	•	Media/media-rich flows (uploads, wall, archive) robust and performant.
+	•	Immediate bug triage and hotfix for moderation/upload edge cases.
+
+Continuous Deployment
+	•	Feature Flags: V1 core experiences easily toggled; AI Coach hooks separate via config.
+	•	Futureproofing: New user/content data flows ready to extend for AI-based personalization, without disruptively rebuilding core V1 surfaces.
+	•	Routine Validation: Focused QA and liveness checks on creative, wall, and archival flows per release.
+
+
+This document captures an updated, V1-focused technical design, with all key development, testing, and deployment activities orbiting the homepage, interactive canvas, and DWTC Clubhouse—ensuring both an expressive launch and a robust foundation for future AI-powered expansion.
+
+
 
 ## Runexpression Website v1 Tech Stack Refinement
 1. The "Must Haves"
