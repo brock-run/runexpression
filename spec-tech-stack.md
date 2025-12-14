@@ -1,3 +1,80 @@
+## tech approach
+
+1. Core Philosophy & Design Principles
+Before defining features, we define the "Soul" of the application based on your notes.
+	•	Interdependence over Independence: The site architecture must support "Groups" (Crews) as first-class citizens, not just individual user profiles.
+	•	Process over Outcome: Metrics (PRs) are secondary. The "Story" (Journal/Blog) takes visual precedence over the "Stats."
+	•	The "Creator" Economy: The E-commerce section is not just a swag shop; it is a gallery. It needs to support high-fidelity visuals for art prints and storytelling for products.
+	•	Flexible Identity: We use the Hybrid JSONB model immediately. A runner’s identity isn't just 5k_time; it’s philosophies, injuries, creative_interests.
+2. Technical Stack (The "Pragmatic Monolith")
+We will use the exact architecture planned for the AI Coach MVP to reduce context switching and build technical equity.
+	•	Frontend: Next.js 14 (App Router). Excellent for SEO (critical for your articles/manifesto) and highly interactive for the tools.
+	•	UI System: Tailwind CSS + Shadcn/UI. Clean, accessible, and easy to theme. We will create a distinct "Run Expression" theme (likely gritty, artistic, distinct from the sterile "SaaS blue" of competitors).
+	•	Backend/Auth: Supabase.
+	•	Auth: Handles user logins for Club areas.
+	•	Database: PostgreSQL.
+	•	Storage: For hosting user-uploaded art or PDF resources.
+	•	Commerce: Stripe Checkout. We will build a lightweight product catalog in Supabase but offload all complexity (cart logic, tax, payments) to Stripe.
+	•	Content: MDX (Markdown + React Components). This allows you to write articles that include interactive elements (e.g., a pace calculator embedded inside an essay about pacing).
+3. V1 Feature Specifications
+A. The Public Face (Expression & Resource)
+1. The Manifesto (Home)
+	•	A visually immersive scrolling narrative explaining "The Expressive Runner" framework.
+	•	High-quality imagery (Landon Peacock’s art style).
+	•	Call to Action: "Join the Movement" (Newsletter/Auth capture).
+2. The Library (Content)
+	•	Essays & Stories: Categories for "Philosophy," "The Bacon Ritual" (Community), and "Performance."
+	•	Visual Art Gallery: A section to showcase sketches, paintings, and comics.
+	•	Tech Implementation: MDX-backed blog. This allows you to treat content as code, version controlling your essays.
+3. Interactive Tools (The "Hook")
+	•	Purpose: Utility brings traffic; philosophy keeps them.
+	•	V1 Tools:
+	•	"The Expressive Pace Calculator": Standard VDOT math, but with "Vibe" descriptors (e.g., instead of just "Easy Pace," it adds "Conversational, bacon-cooking pace").
+	•	"Race Readiness Check": A simple quiz based on your coaching logic (Are you ready for a marathon?) that leads to a lead capture.
+B. The Marketplace (Commerce)
+1. The Shop
+	•	Products:
+	•	Physical: Greeting cards (packs of 5), T-shirts (Print-on-Demand integration or manual fulfillment), Art Prints.
+	•	Digital: "The Expressive Runner Handbook" (PDF), "Marathon Block 1" (PDF Plan).
+	•	Tech Flow:
+	•	Product Catalog stored in Supabase.
+	•	"Add to Cart" uses a persistent local state.
+	•	Checkout redirects to a Stripe Hosted Page (simplest PCI compliance).
+	•	Webhooks listen for checkout.session.completed to unlock digital content in the user's dashboard.
+C. The "Clubhouse" (Authenticated Experience)
+This is the MVP of the community aspect.
+1. User Profiles
+	•	Users sign up via Magic Link (Email) or Google.
+	•	Onboarding: Users answer 3 questions: "Current Goal," "Why do you run?" (Free text for AI analysis later), "Zip Code."
+	•	Data Strategy: This creates the auth.users and public.profiles rows we need for the AI Coach later.
+2. Club Areas (e.g., "DWest Track Crew")
+	•	Access Control: We use Supabase RLS (Row Level Security). Only users with a club_membership row for "DWest" can access /club/dwest.
+	•	Features:
+	•	The Bulletin Board: Simple admin-posted updates (next workout, next bacon meetup).
+	•	The Archive: Shared PDFs, routes, or workout history.
+	•	Member List: A simple directory of who is in the crew.
+4. Data Architecture (Schema Strategy)
+We will use the Hybrid Relational/JSONB model immediately to support the "Expressive Runner" profile.
+-- 1. PROFILES (The Core User) -- Mirrors the AI Coach 'athletes' table structure create table profiles (   id uuid references auth.users on delete cascade,   email text,   full_name text,   avatar_url text,      -- The "Expressive" JSONB column   -- Stores: bio, philosophy_alignment, injury_history, shoe_preferences   expression_data jsonb default '{}'::jsonb,       created_at timestamptz default now(),   primary key (id) );  -- 2. CLUBS (The Community Units) create table clubs (   id uuid default gen_random_uuid() primary key,   name text not null, -- e.g., "DWest Track Crew"   slug text unique not null, -- e.g., "dwest"   description text,      -- JSONB for branding (colors, logos) and specific rituals (bacon_rules)   manifesto jsonb default '{}'::jsonb,       created_at timestamptz default now() );  -- 3. MEMBERSHIPS (The Link) create table club_memberships (   user_id uuid references profiles(id),   club_id uuid references clubs(id),   role text check (role in ('admin', 'coach', 'member')),   joined_at timestamptz default now(),   primary key (user_id, club_id) );  -- 4. PRODUCTS (The Marketplace) create table products (   id uuid default gen_random_uuid() primary key,   stripe_price_id text, -- Link to Stripe   name text,   description text,   type text check (type in ('physical', 'digital', 'service')),   images text[],   active boolean default true ); 
+5. Implementation Roadmap (Phased)
+Phase 1: The Foundation (Weeks 1-2)
+	•	Setup: Next.js repo, Tailwind, Supabase project.
+	•	Identity: Implement the "Run Expression" visual theme.
+	•	The Manifesto: Build the Home page and "About" page as static content.
+	•	Auth: Set up Login/Signup flows.
+Phase 2: Content & Tools (Weeks 3-4)
+	•	Blog Engine: Build the MDX pipeline for articles.
+	•	Tool: Build the "Expressive Pace Calculator" (React component).
+	•	SEO: Configure metadata and sitemaps.
+Phase 3: The Shop (Weeks 5-6)
+	•	Stripe: Setup Stripe account and products.
+	•	Integration: Build the Product Grid and Checkout flow.
+	•	Digital Fulfillment: Simple logic to email PDFs upon purchase.
+Phase 4: The Clubhouse (Weeks 7-8)
+	•	Data: Create the "DWest" club row in the DB.
+	•	Gated Logic: Build the /club/[slug] dynamic route.
+	•	Onboarding: Manually invite your crew members to test the login flow.
+
 
 ## Runexpression Website (V1) – Technical Specification & Project Plan Addendum
 1. Product Overview
