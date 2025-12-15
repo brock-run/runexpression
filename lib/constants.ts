@@ -6,32 +6,31 @@
 export const VIBE_TAGS = {
   MINDSET: [
     'Meditative',
-    'Competitive',
-    'Exploratory',
-    'Celebratory',
-    'Defiant',
+    'Aggressive',
+    'Playful',
+    'Dark',
     'Grateful',
-    'Uncertain',
+    'Pain Cave',
   ],
   CONTEXT: [
-    'Solo Journey',
-    'Crew Energy',
-    'Morning Miles',
-    'Late Night Flow',
     'Race Day',
-    'Injury Comeback',
-    'New Territory',
+    'Morning Miles',
+    'Night Run',
+    'Social',
+    'Solo',
+    'Commute',
   ],
-  FEELING: [
-    'Flow State',
-    'Suffering',
-    'Joy',
-    'Struggle',
-    'Peace',
-    'Triumph',
-    'Discovery',
-  ],
+  FEELING: ['Float', 'Grind', 'Flow', 'Heavy', 'Fast', 'Recovery'],
 } as const
+
+// Flatten all vibe tags into single array
+export const ALL_VIBE_TAGS = [
+  ...VIBE_TAGS.MINDSET,
+  ...VIBE_TAGS.CONTEXT,
+  ...VIBE_TAGS.FEELING,
+] as const
+
+export const MAX_VIBE_TAGS = 3
 
 export const EXPRESSION_TYPES = {
   TEXT: 'text',
