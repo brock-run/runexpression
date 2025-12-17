@@ -98,7 +98,7 @@ export default async function MediaPage() {
         <h1 className="mb-4 text-4xl font-bold md:text-5xl">Media Archive</h1>
         <p className="mb-6 max-w-3xl text-lg text-muted-foreground">
           Our visual history. Every photo tells a story of early mornings, hard
-          efforts, and the community we've built mile by mile. This is what
+          efforts, and the community we&apos;ve built mile by mile. This is what
           expressive running looks like.
         </p>
         <Button
@@ -122,7 +122,7 @@ export default async function MediaPage() {
             'al-qudra',
             'crew',
             'race',
-          ].map((filter) => (
+          ].map(filter => (
             <button
               key={filter}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
@@ -165,7 +165,7 @@ export default async function MediaPage() {
                 By {item.author} • {item.date}
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {item.tags.slice(0, 3).map((tag) => (
+                {item.tags.slice(0, 3).map(tag => (
                   <span
                     key={tag}
                     className="rounded-full bg-run-gray-100 px-2 py-0.5 text-xs font-medium text-run-gray-700"

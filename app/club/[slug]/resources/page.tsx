@@ -92,9 +92,9 @@ export default async function ResourcesPage() {
       <div className="border-b border-border pb-8">
         <h1 className="mb-4 text-4xl font-bold md:text-5xl">Resources</h1>
         <p className="mb-6 max-w-3xl text-lg text-muted-foreground">
-          Training plans, route maps, race reports, and everything else we've
-          learned the hard way. Download, share, and add your own wisdom to the
-          collective knowledge.
+          Training plans, route maps, race reports, and everything else
+          we&apos;ve learned the hard way. Download, share, and add your own
+          wisdom to the collective knowledge.
         </p>
         <Button
           asChild
@@ -109,7 +109,7 @@ export default async function ResourcesPage() {
       <section>
         <h2 className="mb-6 text-2xl font-bold">Browse by Category</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map((category) => (
+          {categories.map(category => (
             <Card
               key={category.name}
               className="cursor-pointer p-6 transition-colors hover:border-orange-600 hover:bg-orange-50"
@@ -128,7 +128,7 @@ export default async function ResourcesPage() {
       <section>
         <h2 className="mb-6 text-2xl font-bold">All Resources</h2>
         <div className="space-y-4">
-          {resources.map((resource) => (
+          {resources.map(resource => (
             <Card key={resource.id} className="p-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex-grow">
@@ -145,7 +145,7 @@ export default async function ResourcesPage() {
                     {resource.description}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {resource.tags.map((tag) => (
+                    {resource.tags.map(tag => (
                       <span
                         key={tag}
                         className="rounded-full bg-run-gray-100 px-3 py-1 text-xs font-medium text-run-gray-700"

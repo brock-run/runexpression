@@ -23,7 +23,7 @@ export default function UploadPage() {
     setUploading(true)
 
     // TODO: Implement actual upload logic with Supabase
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise(resolve => setTimeout(resolve, 1500))
 
     alert('Upload successful! Your contribution will be reviewed shortly.')
     setUploading(false)
@@ -107,7 +107,7 @@ export default function UploadPage() {
                 id="title"
                 placeholder="The Day I Broke into the Sub-16 Club"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={e => setTitle(e.target.value)}
                 maxLength={TEXT_LIMITS.CLUBHOUSE_TITLE}
                 required
               />
@@ -123,13 +123,13 @@ export default function UploadPage() {
                 className="min-h-64 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 placeholder="It started on a Tuesday morning. The air was thick with humidity and questionable life choices..."
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
+                onChange={e => setBody(e.target.value)}
                 maxLength={TEXT_LIMITS.CLUBHOUSE_BODY}
                 required
               />
               <p className="mt-1 text-xs text-muted-foreground">
-                {body.length}/{TEXT_LIMITS.CLUBHOUSE_BODY} characters •
-                Markdown supported
+                {body.length}/{TEXT_LIMITS.CLUBHOUSE_BODY} characters • Markdown
+                supported
               </p>
             </div>
 
@@ -139,7 +139,7 @@ export default function UploadPage() {
                 id="tags"
                 placeholder="bacon, sub-16, time-trial, suffering"
                 value={tags}
-                onChange={(e) => setTags(e.target.value)}
+                onChange={e => setTags(e.target.value)}
               />
               <p className="mt-1 text-xs text-muted-foreground">
                 Comma-separated. Helps others find your story.
@@ -149,12 +149,14 @@ export default function UploadPage() {
             <div className="rounded-lg border border-border bg-run-gray-50 p-4 text-sm">
               <p className="mb-2 font-medium">📝 Writing Tips:</p>
               <ul className="list-inside list-disc space-y-1 text-muted-foreground">
-                <li>Write like you're talking in the parking lot after a run</li>
-                <li>Be honest about the suffering and the absurdity</li>
-                <li>Focus on the "why" more than the "what"</li>
                 <li>
-                  You can use markdown: **bold**, *italic*, [links](url)
+                  Write like you&apos;re talking in the parking lot after a run
                 </li>
+                <li>Be honest about the suffering and the absurdity</li>
+                <li>
+                  Focus on the &quot;why&quot; more than the &quot;what&quot;
+                </li>
+                <li>You can use markdown: **bold**, *italic*, [links](url)</li>
               </ul>
             </div>
 
@@ -214,7 +216,7 @@ export default function UploadPage() {
                 className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 placeholder="Dawn patrol at 4:47 AM. The world belongs to us."
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
+                onChange={e => setBody(e.target.value)}
                 maxLength={TEXT_LIMITS.CLUBHOUSE_CAPTION}
               />
               <p className="mt-1 text-xs text-muted-foreground">
@@ -228,7 +230,7 @@ export default function UploadPage() {
                 id="media-tags"
                 placeholder="dawn-patrol, track, crew, bacon"
                 value={tags}
-                onChange={(e) => setTags(e.target.value)}
+                onChange={e => setTags(e.target.value)}
               />
             </div>
 
@@ -265,7 +267,7 @@ export default function UploadPage() {
                 id="doc-title"
                 placeholder="DWTC Training Plan - 5K Speed"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={e => setTitle(e.target.value)}
                 maxLength={TEXT_LIMITS.CLUBHOUSE_TITLE}
                 required
               />
@@ -286,9 +288,7 @@ export default function UploadPage() {
                   <input
                     id="doc-file"
                     type="file"
-                    accept={FILE_UPLOAD_LIMITS.ALLOWED_DOCUMENT_TYPES.join(
-                      ','
-                    )}
+                    accept={FILE_UPLOAD_LIMITS.ALLOWED_DOCUMENT_TYPES.join(',')}
                     className="mt-4"
                   />
                 </div>
@@ -302,7 +302,7 @@ export default function UploadPage() {
                 className="min-h-32 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 placeholder="Our signature 8-week training plan for breaking into the Sub-16 club..."
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
+                onChange={e => setBody(e.target.value)}
                 maxLength={TEXT_LIMITS.CLUBHOUSE_CAPTION}
               />
             </div>
@@ -313,7 +313,7 @@ export default function UploadPage() {
                 id="doc-tags"
                 placeholder="training-plan, sub-16, 5k"
                 value={tags}
-                onChange={(e) => setTags(e.target.value)}
+                onChange={e => setTags(e.target.value)}
               />
             </div>
 
