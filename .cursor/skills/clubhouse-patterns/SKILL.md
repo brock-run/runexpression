@@ -72,6 +72,29 @@ export function UploadPortal() {
     }
   }
 
+  const handleSubmit = async () => {
+    try {
+      // Submit to API (create entry in clubhouse)
+      const response = await fetch('/api/clubhouse/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content_type: state.contentType,
+          file_url: state.file ? URL.createObjectURL(state.file) : null,
+          ...state.metadata
+        })
+      })
+
+      if (!response.ok) throw new Error('Upload failed')
+
+      // Success - reset form or redirect
+      alert('Added to archive successfully!')
+    } catch (error) {
+      console.error('Submit failed:', error)
+      alert("Oops, that didn't work. Try again?")
+    }
+  }
+
   return (
     <div className="upload-portal">
       {/* Step indicator */}
@@ -110,6 +133,10 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Compressor from 'compressorjs'
 
+interface Props {
+  onUploadComplete: (url: string) => void
+}
+
 export function FileUploader({ onUploadComplete }: Props) {
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -133,7 +160,10 @@ export function FileUploader({ onUploadComplete }: Props) {
           cacheControl: '3600',
           upsert: false,
           onUploadProgress: (progress) => {
-            setProgress(progress.percent || 0)
+            const percent = progress.total
+              ? (progress.loaded / progress.total) * 100
+              : 0
+            setProgress(percent)
           }
         })
 
@@ -147,7 +177,14 @@ export function FileUploader({ onUploadComplete }: Props) {
       onUploadComplete(urlData.publicUrl)
     } catch (error) {
       console.error('Upload failed:', error)
-      // Show brand-aligned error
+
+      // Capture error for monitoring
+      if (typeof window !== 'undefined' && window.Sentry) {
+        window.Sentry.captureException(error)
+      }
+
+      // Show brand-aligned error to user
+      alert("Oops, that didn't work. Try uploading again?")
     } finally {
       setUploading(false)
     }
@@ -190,6 +227,20 @@ interface MediaItem {
 export function MediaGallery({ items }: { items: MediaItem[] }) {
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null)
 
+  const navigateNext = () => {
+    if (!selectedItem) return
+    const currentIndex = items.findIndex(item => item.id === selectedItem.id)
+    const nextIndex = (currentIndex + 1) % items.length
+    setSelectedItem(items[nextIndex])
+  }
+
+  const navigatePrev = () => {
+    if (!selectedItem) return
+    const currentIndex = items.findIndex(item => item.id === selectedItem.id)
+    const prevIndex = (currentIndex - 1 + items.length) % items.length
+    setSelectedItem(items[prevIndex])
+  }
+
   return (
     <>
       <div className="media-grid">
@@ -217,8 +268,8 @@ export function MediaGallery({ items }: { items: MediaItem[] }) {
         <Lightbox
           item={selectedItem}
           onClose={() => setSelectedItem(null)}
-          onNext={() => navigateNext()}
-          onPrev={() => navigatePrev()}
+          onNext={navigateNext}
+          onPrev={navigatePrev}
         />
       )}
     </>
@@ -236,11 +287,35 @@ import { useEffect } from 'react'
 import Image from 'next/image'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 
-export function Lightbox({ 
-  item, 
-  onClose, 
-  onNext, 
-  onPrev 
+// Helper function to format dates
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
+
+interface LightboxProps {
+  item: {
+    id: string
+    title: string
+    image_url: string
+    description?: string
+    created_at: string
+    uploaded_by: string
+  }
+  onClose: () => void
+  onNext: () => void
+  onPrev: () => void
+}
+
+export function Lightbox({
+  item,
+  onClose,
+  onNext,
+  onPrev
 }: LightboxProps) {
   // Keyboard navigation
   useEffect(() => {
@@ -296,27 +371,30 @@ export function Lightbox({
 ```typescript
 // components/clubhouse/lore-story.tsx
 import { MDXRemote } from 'next-mdx-remote/rsc'
-import { serialize } from 'next-mdx-remote/serialize'
 import Image from 'next/image'
+
+// Helper function to format dates
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
 
 interface LoreStory {
   id: string
   title: string
   content: string // Markdown content
-  author_id: string
+  author?: {
+    full_name: string
+  } | null
   created_at: string
   images?: string[]
 }
 
 export async function LoreStory({ story }: { story: LoreStory }) {
-  // Serialize markdown to MDX
-  const mdxSource = await serialize(story.content, {
-    mdxOptions: {
-      remarkPlugins: [],
-      rehypePlugins: []
-    }
-  })
-
   // Custom components for MDX
   const components = {
     img: (props: any) => (
@@ -340,13 +418,13 @@ export async function LoreStory({ story }: { story: LoreStory }) {
       <header>
         <h1>{story.title}</h1>
         <div className="story-meta">
-          <span>By {story.author?.full_name}</span>
+          <span>By {story.author?.full_name || 'Anonymous'}</span>
           <time>{formatDate(story.created_at)}</time>
         </div>
       </header>
-      
+
       <div className="lore-content">
-        <MDXRemote {...mdxSource} components={components} />
+        <MDXRemote source={story.content} components={components} />
       </div>
     </article>
   )
@@ -387,26 +465,43 @@ Process over outcome. Always.
 
 ```typescript
 // lib/clubhouse/membership.ts
+import { createClient } from '@/lib/supabase/server'
+
 export async function checkClubMembership(
   userId: string,
   clubSlug: string
 ): Promise<boolean> {
   const supabase = createClient()
-  
-  const { data } = await supabase
+
+  // First, get the club ID
+  const { data: clubData, error: clubError } = await supabase
+    .from('clubs')
+    .select('id')
+    .eq('slug', clubSlug)
+    .single()
+
+  // If club not found or error, return false
+  if (clubError || !clubData) {
+    console.error('Club lookup failed:', clubError)
+    return false
+  }
+
+  const clubId = clubData.id
+
+  // Check if user is a member of this club
+  const { data: membershipData, error: membershipError } = await supabase
     .from('club_memberships')
     .select('id')
     .eq('user_id', userId)
-    .eq('club_id', (
-      await supabase
-        .from('clubs')
-        .select('id')
-        .eq('slug', clubSlug)
-        .single()
-    ).data?.id)
+    .eq('club_id', clubId)
     .single()
 
-  return !!data
+  // If membership not found or error, return false
+  if (membershipError || !membershipData) {
+    return false
+  }
+
+  return true
 }
 ```
 
