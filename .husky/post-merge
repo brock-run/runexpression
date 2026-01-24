@@ -3,12 +3,9 @@
 
 # Auto-update Linear issues when merged to main branch
 
-# Check if this is a true merge (not a fast-forward)
-# MERGE_HEAD exists only during/after a merge commit
-if ! git rev-parse --verify MERGE_HEAD >/dev/null 2>&1; then
-  # Not a merge, exit early (likely a fast-forward pull)
-  exit 0
-fi
+# The post-merge hook receives a single argument: a flag indicating
+# whether the merge was a squash merge (1) or not (0).
+# For fast-forward merges, post-merge still runs but HEAD will have only 1 parent.
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
