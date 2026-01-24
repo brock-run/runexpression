@@ -15,6 +15,13 @@
     "test:ci": "jest --ci",
     "db:types": "npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > types/database.types.ts",
     "db:push": "npx supabase db push",
+    "sync:adrs": "node scripts/sync-adrs-to-skills.js",
+    "sync:adrs:dry": "node scripts/sync-adrs-to-skills.js --dry-run",
+    "validate:skills": "node scripts/validate-skills-agents.js",
+    "sync:skills": "./convert-skills.sh",
+    "generate:guide": "node scripts/generate-ai-agent-guide.js",
+    "skills:list": "ls -1 .cursor/skills",
+    "agents:list": "ls -1 .cursor/agents",
     "prepare": "husky"
   },
   "dependencies": {

@@ -1,0 +1,177 @@
+# RunExpression Project Rules
+
+## Project Overview
+RunExpression is a digital ecosystem for "Expressive Runners" - a platform where running is viewed as creative expression, community connection, and personal transformation. Built with Next.js 14+ (App Router), TypeScript, Supabase, and Tailwind CSS + Shadcn/UI.
+
+## Core Principles
+1. **Build for Belonging**: Every feature should help runners feel less alone
+2. **Process Over Outcome**: Ship iteratively, V1 is foundation not finish line
+3. **Creative Constraint**: Limit V1 scope aggressively, deep execution beats shallow
+4. **AI-Ready, Not AI-First**: Capture structured data now, build AI features later
+5. **The "Sage in the Parking Lot" Standard**: Deep but accessible, serious but fun
+
+## Technology Stack
+- **Framework**: Next.js 14+ (App Router) with TypeScript
+- **Backend**: Supabase (PostgreSQL, Auth, Storage, Realtime)
+- **Styling**: Tailwind CSS + Shadcn/UI components
+- **Animation**: Framer Motion
+- **Content**: MDX (next-mdx-remote)
+- **Payments**: Stripe (hosted checkout)
+- **Deployment**: Vercel
+
+## Architecture Decisions
+- **Pragmatic Monolith**: Single Next.js app for V1 (not microservices)
+- **Hybrid Schema**: Relational tables for core entities, JSONB for flexible attributes
+- **Server Components First**: Default to Server Components, use Client Components only when needed
+- **RLS Everywhere**: All database tables use Row Level Security policies
+
+## TypeScript Standards
+- Always define types explicitly, never use `any` (use `unknown` if truly unknown)
+- Prefer interfaces over type aliases for object shapes
+- Use optional chaining and nullish coalescing: `user?.full_name ?? 'Anonymous'`
+- Explicit return types for public functions
+- Match database column naming (snake_case): `full_name`, not `fullName`
+
+## React Patterns
+- **Default to Server Components**: Only use `'use client'` for interactivity (useState, useEffect, event handlers, Framer Motion, Realtime)
+- **Component Naming**: PascalCase for components, kebab-case for files
+- **File Structure**: `components/flow/flow-wall.tsx` → component `FlowWall`
+- **Hooks**: Custom hooks start with `use`, place all hooks at top of component
+- **Event Handlers**: Name with `handle` prefix: `handleSubmit`, `handleInputChange`
+
+## File Organization
+```
+/app/              # Next.js App Router routes
+  (public)/        # Public routes (no auth)
+  (flow)/          # Flow features
+  (app)/           # Authenticated routes
+  api/             # API routes
+/components/       # React components
+  ui/              # Shadcn/UI components
+  flow/            # Feature-specific components
+  shared/          # Shared components
+/lib/              # Utilities and helpers
+  supabase/        # Supabase clients (client.ts, server.ts, admin.ts)
+  utils/           # Utility functions
+/types/            # TypeScript types
+```
+
+## Import Order
+1. React and Next.js
+2. Third-party libraries
+3. Internal modules (using `@/` alias)
+4. Relative imports
+5. Styles
+
+## Naming Conventions
+- **Files**: kebab-case (`flow-post-card.tsx`)
+- **Components**: PascalCase (`FlowPostCard`)
+- **Variables/Functions**: camelCase (`userName`, `calculatePace`)
+- **Constants**: UPPER_SNAKE_CASE (`MAX_POST_LENGTH`)
+- **Database**: snake_case (matches Supabase schema)
+
+## Database Conventions
+- **Tables**: Plural nouns, snake_case (`expression_events`, `club_memberships`)
+- **Primary Keys**: Always `id` (uuid)
+- **Foreign Keys**: `{table_singular}_id` (`user_id`, `club_id`)
+- **Timestamps**: `created_at`, `updated_at` (timestamptz)
+- **JSONB**: Use for flexible attributes (`expression_data`, `metadata`)
+- **RLS**: Enable on all tables, create descriptive policies
+- **Indexes**: Index foreign keys and frequently queried columns
+
+## Brand Voice & Content
+- **Voice**: "The Sage in the Parking Lot" - deep but accessible, serious but lighthearted
+- **Tone**: Generative & invitational, vulnerable & honest
+- **Avoid**: Fitness industry clichés ("crush it", "beast mode"), gatekeeping pace/performance, corporate jargon
+- **Do**: Lead with emotion, support with logic; balance profound with mundane; use "we" more than "I"
+
+## UI/UX Patterns
+- **Colors**: Sage green (#6B7F6E), purple (#8B5CF6), cream (#F5F5DC)
+- **Typography**: Monospace (DM Mono) for UI labels/buttons, serif (Merriweather) for body text
+- **Accessibility**: WCAG 2.1 AA minimum, keyboard navigation, screen reader support
+- **Animation**: Respect `prefers-reduced-motion`, use Framer Motion for purposeful motion
+- **Mobile-First**: Start with mobile, enhance for desktop
+- **Touch Targets**: Minimum 44x44px
+
+## Error Handling
+- **API Routes**: Always return structured errors with status codes
+- **Client-Side**: Use toast notifications for user-facing errors
+- **Logging**: Structured logging with context (userId, action, timestamp)
+- **Sentry**: Use for production error tracking
+
+## Performance
+- **Images**: Always use `next/image`, optimize with WebP
+- **Dynamic Imports**: Use for heavy components (Framer Motion, Fabric.js)
+- **Database Queries**: Select only needed columns, use pagination
+- **Bundle Size**: Monitor with `@next/bundle-analyzer`
+
+## Git Workflow
+- **Branch Naming**: `feature/`, `fix/`, `chore/`, `docs/` prefixes with kebab-case
+- **Commits**: Conventional commit format: `feat(scope): Subject`
+- **PRs**: Keep small (50-300 lines), include test plan and screenshots
+- **Merge**: Prefer squash merge for feature branches
+
+## Code Quality
+- **Linting**: ESLint with Next.js config, no `any` types
+- **Formatting**: Prettier with Tailwind plugin
+- **Type Checking**: Run `npm run type-check` before committing
+- **Hooks**: Pre-commit runs lint-staged, commit-msg validates conventional commits
+
+## Security
+- **Environment Variables**: Never commit secrets, use `.env.local` (gitignored)
+- **Client-Side Env**: Use `NEXT_PUBLIC_` prefix for browser-accessible vars
+- **RLS**: Enforce access control at database level
+- **Input Validation**: Always validate user input (use Zod schemas)
+- **Service Role**: Only use server-side, never expose to client
+
+## Testing
+- **Unit Tests**: Jest + React Testing Library
+- **File Naming**: `flow-submit.ts` → `flow-submit.test.ts`
+- **E2E Tests**: Playwright (for critical flows)
+
+## Common Patterns
+
+### Supabase Client Usage
+```typescript
+// Server Component
+import { createClient } from '@/lib/supabase/server'
+const supabase = createClient()
+const { data } = await supabase.from('expression_events').select('*')
+
+// Client Component
+import { createClient } from '@/lib/supabase/client'
+const supabase = createClient()
+```
+
+### Form Validation
+```typescript
+import { z } from 'zod'
+const schema = z.object({
+  content: z.string().min(5).max(500),
+  vibeTags: z.array(z.string()).max(5).optional()
+})
+```
+
+### Error Messages
+- Use friendly, human language: "Oops, that didn't work. Try again?" not "Error 500"
+- Success messages: "Your expression just joined the Flow" not "Submitted successfully"
+
+## V1 Scope Reminders
+- ✅ IN: Homepage, Flow (text + image), DWTC Clubhouse, Blog framework, Shop framework, AI Coach waitlist
+- ❌ OUT: Sticker studio (V1.1), Drawing pad (V1.1), Print-on-demand automation (V1.1), Multiple clubs (DWTC only for V1)
+
+## Key Features
+1. **Homepage**: Scroll-driven manifesto with 4 chapters (Motion Creates Emotion, Process Over Outcome, Interdependence, Living Laboratory)
+2. **The Flow**: Community expression wall with text/image submissions, vibe tags, moderation (OpenAI + trust scoring)
+3. **DWTC Clubhouse**: Member archive (Lore, Media, Resources) with upload portal
+4. **Blog/Library**: MDX-based content system
+5. **Shop**: Stripe-hosted checkout for physical/digital products
+
+## When in Doubt
+- Check the docs in `/docs/` directory
+- Follow the "Sage in the Parking Lot" voice test: Would this make a runner feel less alone?
+- Default to Server Components, add `'use client'` only when needed
+- Use TypeScript strictly, no `any`
+- Match database naming (snake_case)
+- Keep PRs small and focused
+- Write clear commit messages
