@@ -1,8 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { env } from '@/env'
 
 /**
- * Enforce auth for protected routes and refresh Supabase cookies.
+ * Next.js middleware for authentication and route protection
+ *
+ * Handles Supabase session refresh and redirects unauthenticated
+ * users from protected routes to the login page.
  */
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -12,14 +16,14 @@ export async function middleware(request: NextRequest) {
   })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         get(name: string) {
           return request.cookies.get(name)?.value
         },
-        set(name: string, value: string, options: any) {
+        set(name: string, value: string, options: Record<string, unknown>) {
           request.cookies.set({
             name,
             value,
@@ -36,7 +40,7 @@ export async function middleware(request: NextRequest) {
             ...options,
           })
         },
-        remove(name: string, options: any) {
+        remove(name: string, options: Record<string, unknown>) {
           request.cookies.set({
             name,
             value: '',
@@ -73,7 +77,7 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path)
   )
 
-  if (isProtectedPath && !user && !isPublicPath) {
+  if (isProtectedPath && !user) {
     const redirectUrl = new URL('/auth/login', request.url)
     redirectUrl.searchParams.set('next', request.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)

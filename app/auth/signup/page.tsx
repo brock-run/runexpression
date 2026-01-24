@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { SignupForm } from '@/components/auth/signup-form'
 
@@ -18,7 +19,9 @@ export default function SignupPage() {
             Start your expressive running journey
           </p>
         </div>
-        <SignupForm />
+        <Suspense fallback={<div className="text-center">Loading...</div>}>
+          <SignupForm />
+        </Suspense>
       </div>
     </div>
   )

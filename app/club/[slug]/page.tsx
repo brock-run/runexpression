@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -131,11 +132,15 @@ export default async function ClubOverviewPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {recentMedia.map((media) => (
             <Card key={media.id} className="overflow-hidden">
-              <img
-                src={media.url}
-                alt={media.caption}
-                className="aspect-[4/3] w-full object-cover"
-              />
+              <div className="relative aspect-[4/3] w-full">
+                <Image
+                  src={media.url}
+                  alt={media.caption}
+                  fill
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
               <div className="p-4">
                 <p className="mb-1 text-sm font-medium">{media.caption}</p>
                 <p className="text-xs text-muted-foreground">

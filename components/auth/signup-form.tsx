@@ -6,7 +6,14 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import * as Sentry from '@sentry/nextjs'
 
+/**
+ * Signup form component with email/password registration
+ *
+ * Handles user registration via Supabase with email confirmation.
+ * Validates password strength and confirmation matching.
+ */
 export function SignupForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -38,20 +45,35 @@ export function SignupForm() {
 
     const supabase = createClient()
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-      },
-    })
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        },
+      })
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+
+        Sentry.captureException(error, {
+          tags: { component: 'signup-form' },
+          extra: { email }
+        })
+      } else {
+        setSuccess(true)
+        setLoading(false)
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.')
       setLoading(false)
-    } else {
-      setSuccess(true)
-      setLoading(false)
+
+      Sentry.captureException(err, {
+        tags: { component: 'signup-form' },
+        extra: { email }
+      })
     }
   }
 

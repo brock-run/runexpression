@@ -10,6 +10,9 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
+  transform: {
+    '^.+\\.(t|j)sx?$': ['@swc/jest'],
+  },
 }
 
 module.exports = createJestConfig(customJestConfig)
