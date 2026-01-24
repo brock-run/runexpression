@@ -118,6 +118,13 @@ const supabase = createAdminClient()
 - **Rate limiting** for public endpoints (consider implementing)
 - **Environment variables** validated via `env.ts` with Zod
 
+### Sentry Instrumentation
+- Use `import * as Sentry from "@sentry/nextjs"`
+- Capture expected API errors with `Sentry.captureException(error)`
+- Wrap key API calls in `Sentry.startSpan` with meaningful `op` and `name`
+- Initialize only in `sentry.server.config.ts` or `sentry.edge.config.ts`
+- Apply the `sentry-instrumentation` skill for new monitoring work
+
 ## Key Skills to Apply
 
 1. **Supabase Integration Expert**
