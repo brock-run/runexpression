@@ -1,12 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import * as Sentry from '@sentry/nextjs'
 
+/**
+ * Login form component with email/password authentication
+ *
+ * Handles user authentication via Supabase and displays appropriate
+ * error messages for failed login attempts.
+ */
 export function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -17,6 +24,16 @@ export function LoginForm() {
   const searchParams = useSearchParams()
   const next = searchParams.get('next') ?? '/'
 
+  // Display error from callback if present
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam === 'auth_callback_failed') {
+      setError('Authentication failed. Please try logging in again.')
+    } else if (errorParam === 'unexpected_error') {
+      setError('An unexpected error occurred. Please try again.')
+    }
+  }, [searchParams])
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -24,17 +41,32 @@ export function LoginForm() {
 
     const supabase = createClient()
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+
+        Sentry.captureException(error, {
+          tags: { component: 'login-form' },
+          extra: { email }
+        })
+      } else {
+        router.push(next)
+        router.refresh()
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.')
       setLoading(false)
-    } else {
-      router.push(next)
-      router.refresh()
+
+      Sentry.captureException(err, {
+        tags: { component: 'login-form' },
+        extra: { email }
+      })
     }
   }
 
