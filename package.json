@@ -24,7 +24,7 @@
     "skills:list": "ls -1 .cursor/skills",
     "agents:list": "ls -1 .cursor/agents",
     "prepare": "husky",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT .next && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT .next"
+    "sentry:sourcemaps": "node -e \"if(!process.env.SENTRY_ORG||!process.env.SENTRY_PROJECT){console.error('Error: SENTRY_ORG and SENTRY_PROJECT must be set');process.exit(1)}\" && sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT .next && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT .next"
   },
   "dependencies": {
     "@mdx-js/react": "^3.1.0",
