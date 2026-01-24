@@ -2,6 +2,9 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { env } from '@/env'
 
+/**
+ * Create a Supabase server client with cookie handling.
+ */
 export function createClient() {
   const cookieStore = cookies()
 

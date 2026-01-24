@@ -1,6 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+/**
+ * Enforce auth for protected routes and refresh Supabase cookies.
+ */
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {

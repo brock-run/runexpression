@@ -9,8 +9,9 @@ const cardVariants = cva(
     variants: {
       variant: {
         default: "",
-        organic: "organic-edges border-sage-200 hover:glow-sage transition-all duration-300",
-        flow: "border-purple-200 hover:border-purple-400 transition-colors",
+        // Use run-* tokens to match Tailwind config and avoid undefined classes.
+        organic: "organic-edges border-run-primary-200 hover-glow-sage transition-all duration-300",
+        flow: "border-run-accent-200 hover:border-run-accent-400 transition-colors",
       },
     },
     defaultVariants: {

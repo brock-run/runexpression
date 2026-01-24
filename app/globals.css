@@ -5,81 +5,82 @@
 @layer base {
   :root {
     /* RunExpression Brand Colors */
-    /* Sage Green - Primary brand color for accents, CTAs, trust */
-    --sage-50: 147 15% 95%;
-    --sage-100: 147 15% 88%;
-    --sage-200: 147 15% 76%;
-    --sage-300: 147 20% 64%;
-    --sage-400: 147 25% 52%;
-    --sage-500: 147 30% 40%;    /* Primary sage */
-    --sage-600: 147 35% 32%;
-    --sage-700: 147 40% 24%;
-    --sage-800: 147 45% 16%;
-    --sage-900: 147 50% 10%;
+    /* Primary (Sage) - accents, CTAs, trust */
+    --run-primary-50: 147 15% 95%;
+    --run-primary-100: 147 15% 88%;
+    --run-primary-200: 147 15% 76%;
+    --run-primary-300: 147 20% 64%;
+    --run-primary-400: 147 25% 52%;
+    --run-primary-500: 147 30% 40%;
+    --run-primary-600: 147 35% 32%;
+    --run-primary-700: 147 40% 24%;
+    --run-primary-800: 147 45% 16%;
+    --run-primary-900: 147 50% 10%;
 
-    /* Purple - Energy, flow, transformation */
-    --purple-50: 270 30% 96%;
-    --purple-100: 270 30% 92%;
-    --purple-200: 270 30% 84%;
-    --purple-300: 270 35% 72%;
-    --purple-400: 270 40% 60%;
-    --purple-500: 270 50% 48%;  /* Primary purple */
-    --purple-600: 270 55% 38%;
-    --purple-700: 270 60% 28%;
-    --purple-800: 270 65% 20%;
-    --purple-900: 270 70% 12%;
+    /* Accent (Purple) - energy, flow, transformation */
+    --run-accent-50: 270 30% 96%;
+    --run-accent-100: 270 30% 92%;
+    --run-accent-200: 270 30% 84%;
+    --run-accent-300: 270 35% 72%;
+    --run-accent-400: 270 40% 60%;
+    --run-accent-500: 270 50% 48%;
+    --run-accent-600: 270 55% 38%;
+    --run-accent-700: 270 60% 28%;
+    --run-accent-800: 270 65% 20%;
+    --run-accent-900: 270 70% 12%;
 
-    /* Cream/Warm Neutrals - Warmth, approachability */
-    --cream-50: 40 25% 98%;
-    --cream-100: 40 25% 95%;
-    --cream-200: 40 20% 90%;
-    --cream-300: 40 15% 85%;
-    --cream-400: 40 12% 75%;
+    /* Neutral (Cream) - warmth, approachability */
+    --run-neutral-0: 0 0% 100%;
+    --run-neutral-50: 40 25% 98%;
+    --run-neutral-100: 40 25% 95%;
+    --run-neutral-200: 40 20% 90%;
+    --run-neutral-300: 40 15% 85%;
+    --run-neutral-400: 40 12% 75%;
 
     /* Semantic Tokens (Light Mode) */
-    --background: 40 25% 98%;        /* cream-50 */
-    --foreground: 147 50% 10%;       /* sage-900 - deep sage for text */
-    --card: 0 0% 100%;
-    --card-foreground: 147 50% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 147 50% 10%;
-    --primary: 147 30% 40%;          /* sage-500 - primary brand actions */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 270 50% 48%;        /* purple-500 - secondary actions */
-    --secondary-foreground: 0 0% 100%;
-    --muted: 40 20% 90%;             /* cream-200 */
-    --muted-foreground: 147 40% 24%; /* sage-700 */
-    --accent: 270 30% 92%;           /* purple-100 - subtle accents */
-    --accent-foreground: 270 70% 12%; /* purple-900 */
+    --background: var(--run-neutral-50);
+    --foreground: var(--run-primary-900);
+    --card: var(--run-neutral-0);
+    --card-foreground: var(--run-primary-900);
+    --popover: var(--run-neutral-0);
+    --popover-foreground: var(--run-primary-900);
+    --primary: var(--run-primary-500);
+    --primary-foreground: var(--run-neutral-0);
+    --secondary: var(--run-accent-500);
+    --secondary-foreground: var(--run-neutral-0);
+    --muted: var(--run-neutral-200);
+    --muted-foreground: var(--run-primary-700);
+    --accent: var(--run-accent-100);
+    --accent-foreground: var(--run-accent-900);
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 147 15% 88%;           /* sage-100 */
-    --input: 147 15% 88%;            /* sage-100 */
-    --ring: 147 30% 40%;             /* sage-500 - focus rings */
+    --destructive-foreground: var(--run-neutral-0);
+    --border: var(--run-primary-100);
+    --input: var(--run-primary-100);
+    --ring: var(--run-primary-500);
     --radius: 0.5rem;
   }
 
   .dark {
     /* Dark mode: Invert the hierarchy, keep brand colors */
-    --background: 147 50% 10%;       /* sage-900 - dark sage background */
-    --foreground: 40 25% 98%;        /* cream-50 - light text */
-    --card: 147 45% 16%;             /* sage-800 */
-    --card-foreground: 40 25% 98%;
-    --popover: 147 45% 16%;
-    --popover-foreground: 40 25% 98%;
-    --primary: 147 25% 52%;          /* sage-400 - lighter sage for dark bg */
-    --primary-foreground: 147 50% 10%;
-    --secondary: 270 40% 60%;        /* purple-400 - lighter purple */
-    --secondary-foreground: 147 50% 10%;
-    --muted: 147 40% 24%;            /* sage-700 */
-    --muted-foreground: 40 20% 90%;  /* cream-200 */
-    --accent: 270 60% 28%;           /* purple-700 */
-    --accent-foreground: 270 30% 96%; /* purple-50 */
+    --background: var(--run-primary-900);
+    --foreground: var(--run-neutral-50);
+    --card: var(--run-primary-800);
+    --card-foreground: var(--run-neutral-50);
+    --popover: var(--run-primary-800);
+    --popover-foreground: var(--run-neutral-50);
+    --primary: var(--run-primary-400);
+    --primary-foreground: var(--run-primary-900);
+    --secondary: var(--run-accent-400);
+    --secondary-foreground: var(--run-primary-900);
+    --muted: var(--run-primary-700);
+    --muted-foreground: var(--run-neutral-200);
+    --accent: var(--run-accent-700);
+    --accent-foreground: var(--run-accent-50);
     --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 147 35% 32%;           /* sage-600 */
-    --input: 147 35% 32%;
-    --ring: 147 25% 52%;             /* sage-400 */
+    --destructive-foreground: var(--run-neutral-0);
+    --border: var(--run-primary-600);
+    --input: var(--run-primary-600);
+    --ring: var(--run-primary-400);
   }
 }
 
@@ -114,22 +115,32 @@
 
   /* Purple glow effect for interactive elements */
   .glow-purple {
-    box-shadow: 0 0 20px rgba(147, 102, 153, 0.3),
-                0 0 40px rgba(147, 102, 153, 0.1);
+    box-shadow: 0 0 20px hsl(var(--run-accent-500) / 0.3),
+                0 0 40px hsl(var(--run-accent-500) / 0.1);
   }
 
   .glow-sage {
-    box-shadow: 0 0 20px rgba(99, 128, 116, 0.3),
-                0 0 40px rgba(99, 128, 116, 0.1);
+    box-shadow: 0 0 20px hsl(var(--run-primary-500) / 0.3),
+                0 0 40px hsl(var(--run-primary-500) / 0.1);
+  }
+
+  .hover-glow-purple:hover {
+    box-shadow: 0 0 20px hsl(var(--run-accent-500) / 0.3),
+                0 0 40px hsl(var(--run-accent-500) / 0.1);
+  }
+
+  .hover-glow-sage:hover {
+    box-shadow: 0 0 20px hsl(var(--run-primary-500) / 0.3),
+                0 0 40px hsl(var(--run-primary-500) / 0.1);
   }
 
   /* Flow gradient (for The Flow feature) */
   .flow-gradient {
     background: linear-gradient(
       135deg,
-      hsl(var(--sage-500)) 0%,
-      hsl(var(--purple-500)) 50%,
-      hsl(var(--sage-600)) 100%
+      hsl(var(--run-primary-500)) 0%,
+      hsl(var(--run-accent-500)) 50%,
+      hsl(var(--run-primary-600)) 100%
     );
   }
 
