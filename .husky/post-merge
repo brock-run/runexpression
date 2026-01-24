@@ -3,6 +3,13 @@
 
 # Auto-update Linear issues when merged to main branch
 
+# Check if this is a true merge (not a fast-forward)
+# MERGE_HEAD exists only during/after a merge commit
+if ! git rev-parse --verify MERGE_HEAD >/dev/null 2>&1; then
+  # Not a merge, exit early (likely a fast-forward pull)
+  exit 0
+fi
+
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Only run on main/master merges

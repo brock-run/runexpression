@@ -19,12 +19,12 @@
     "sync:adrs": "node scripts/sync-adrs-to-skills.js",
     "sync:adrs:dry": "node scripts/sync-adrs-to-skills.js --dry-run",
     "validate:skills": "node scripts/validate-skills-agents.js",
-    "sync:skills": "./convert-skills.sh",
+    "sync:skills": "./scripts/convert-skills.sh",
     "generate:guide": "node scripts/generate-ai-agent-guide.js",
     "skills:list": "ls -1 .cursor/skills",
     "agents:list": "ls -1 .cursor/agents",
     "prepare": "husky",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org run-expression --project runex-website .next && sentry-cli sourcemaps upload --org run-expression --project runex-website .next"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT .next && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT .next"
   },
   "dependencies": {
     "@mdx-js/react": "^3.1.0",
