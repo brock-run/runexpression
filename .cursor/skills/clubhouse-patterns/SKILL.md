@@ -74,15 +74,23 @@ export function UploadPortal() {
 
   const handleSubmit = async () => {
     try {
+      // Use FormData to send file content (not a blob URL)
+      const formData = new FormData()
+      formData.append('content_type', state.contentType || '')
+      formData.append('title', state.metadata.title)
+      formData.append('description', state.metadata.description)
+      formData.append('tags', JSON.stringify(state.metadata.tags))
+      formData.append('date', state.metadata.date)
+      
+      if (state.file) {
+        formData.append('file', state.file) // Send actual file, not blob URL
+      }
+
       // Submit to API (create entry in clubhouse)
       const response = await fetch('/api/clubhouse/upload', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content_type: state.contentType,
-          file_url: state.file ? URL.createObjectURL(state.file) : null,
-          ...state.metadata
-        })
+        // Note: Don't set Content-Type header - browser sets it with boundary
+        body: formData
       })
 
       if (!response.ok) throw new Error('Upload failed')
