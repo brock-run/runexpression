@@ -18,11 +18,17 @@ const buttonVariants = cva(
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
+        // RunExpression brand variants
+        sage: 'bg-sage-500 text-white hover:bg-sage-600 hover:glow-sage transition-all duration-300',
+        purple: 'bg-purple-500 text-white hover:bg-purple-600 hover:glow-purple transition-all duration-300',
+        flow: 'flow-gradient text-white hover:opacity-90 hover:scale-105 transition-all duration-300',
+        organic: 'bg-sage-500 text-white hover:bg-sage-600 organic-edges transition-all duration-300',
       },
       size: {
         default: 'h-10 px-4 py-2',
         sm: 'h-9 rounded-md px-3',
         lg: 'h-11 rounded-md px-8',
+        xl: 'h-14 rounded-lg px-10 text-base', // For CTAs
         icon: 'h-10 w-10',
       },
     },
