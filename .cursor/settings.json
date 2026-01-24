@@ -1,0 +1,43 @@
+{
+  "mcp": {
+    "servers": {
+      "linear": {
+        "command": "npx",
+        "args": ["-y", "@linear/mcp-server"],
+        "env": {
+          "LINEAR_API_KEY": "${env:LINEAR_API_KEY}"
+        }
+      },
+      "supabase": {
+        "command": "npx",
+        "args": ["-y", "@supabase/mcp-server"],
+        "env": {
+          "SUPABASE_ACCESS_TOKEN": "${env:SUPABASE_ACCESS_TOKEN}",
+          "SUPABASE_PROJECT_ID": "${env:SUPABASE_PROJECT_ID}"
+        }
+      },
+      "gitlab": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-gitlab"],
+        "env": {
+          "GITLAB_TOKEN": "${env:GITLAB_TOKEN}"
+        }
+      },
+      "greptile": {
+        "command": "npx",
+        "args": ["-y", "greptile-mcp-server"],
+        "env": {
+          "GREPTILE_API_KEY": "${env:GREPTILE_API_KEY}"
+        }
+      },
+      "context7": {
+        "command": "npx",
+        "args": ["-y", "@upstash/context7-mcp"]
+      },
+      "playwright": {
+        "command": "npx",
+        "args": ["-y", "@playwright/mcp"]
+      }
+    }
+  }
+}
