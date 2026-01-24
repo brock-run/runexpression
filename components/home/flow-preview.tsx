@@ -37,6 +37,12 @@ export function FlowPreview() {
     const scrollElement = scrollRef.current
     if (!scrollElement || isPaused) return
 
+    // Respect prefers-reduced-motion
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+    if (prefersReducedMotion) return
+
     let animationId: number
     let scrollPosition = 0
     const scrollSpeed = 0.5 // pixels per frame
@@ -84,8 +90,12 @@ export function FlowPreview() {
           ref={scrollRef}
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
+          onFocus={() => setIsPaused(true)}
+          onBlur={() => setIsPaused(false)}
           className="mb-12 overflow-x-hidden whitespace-nowrap"
           style={{ scrollBehavior: 'auto' }}
+          role="marquee"
+          aria-label="Runner intentions and expressions"
         >
           <div className="inline-flex gap-4 py-8">
             {/* Duplicate the array to create seamless loop effect */}
