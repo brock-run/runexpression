@@ -255,7 +255,13 @@ export function FlowSubmissionForm() {
    - Playwright E2E test setup
    - Test data factories
 
-10. **Git Workflow & Conventional Commits**
+10. **Sentry Instrumentation**
+    - Use `@sentry/nextjs` for capture and spans
+    - `Sentry.captureException` in expected error paths
+    - `Sentry.startSpan` for meaningful UI and API actions
+    - Initialize only in `instrumentation-client`, `sentry.server.config.ts`, `sentry.edge.config.ts`
+
+11. **Git Workflow & Conventional Commits**
     - Conventional commit format
     - Branch naming conventions
     - PR best practices
