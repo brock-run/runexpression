@@ -65,12 +65,18 @@ const ADR_MAPPINGS = {
   ]
 };
 
+/**
+ * Check whether a file references a specific ADR number.
+ */
 function checkADRReference(filePath, adrNumber) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const adrPattern = new RegExp(`ADR-${adrNumber}|${adrNumber}-[a-z-]+\\.md`, 'i');
   return adrPattern.test(content);
 }
 
+/**
+ * Validate that a skill or agent file exists and references the ADR.
+ */
 function validateSkillOrAgent(filePath, adrNumber) {
   if (!fs.existsSync(filePath)) {
     return { valid: false, error: 'File not found' };
@@ -80,6 +86,9 @@ function validateSkillOrAgent(filePath, adrNumber) {
   return { valid: hasReference, error: hasReference ? null : 'Missing ADR reference' };
 }
 
+/**
+ * Run validation across accepted ADRs and mapped skills/agents.
+ */
 function main() {
   console.log('🔍 Validating skills and agents against ADRs...\n');
   

@@ -1,6 +1,7 @@
+import type { Metadata } from 'next'
 import { DesignSystemShowcase } from '@/components/examples/design-system-showcase'
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Design System Showcase | RunExpression',
   description: 'Interactive showcase of the RunExpression design system - typography, colors, components, and utilities',
 }

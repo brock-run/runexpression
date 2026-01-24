@@ -368,7 +368,7 @@ export function DesignSystemShowcase() {
             </Card>
 
             {/* Organic Card */}
-            <Card className="border-run-primary-100 bg-run-neutral-0 organic-edges">
+            <Card variant="organic" className="bg-run-neutral-0">
               <CardHeader>
                 <CardTitle className="font-mono text-run-primary-900">
                   Organic Card
@@ -382,7 +382,7 @@ export function DesignSystemShowcase() {
             </Card>
 
             {/* Flow Card */}
-            <Card className="border-run-primary-100 bg-run-neutral-0 organic-edges hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+            <Card variant="flow" className="bg-run-neutral-0">
               <CardHeader>
                 <CardTitle className="font-mono text-run-primary-900">
                   Flow Card
