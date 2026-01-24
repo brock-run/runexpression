@@ -24,7 +24,7 @@
     "skills:list": "ls -1 .cursor/skills",
     "agents:list": "ls -1 .cursor/agents",
     "prepare": "husky",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org run-expression --project javascript-nextjs .next && sentry-cli sourcemaps upload --org run-expression --project javascript-nextjs .next"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org run-expression --project runex-website .next && sentry-cli sourcemaps upload --org run-expression --project runex-website .next"
   },
   "dependencies": {
     "@mdx-js/react": "^3.1.0",
