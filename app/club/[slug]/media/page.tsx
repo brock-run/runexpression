@@ -1,6 +1,7 @@
+import Link from 'next/link'
+import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 
 export default async function MediaPage() {
   // Mock data - will be replaced with Supabase queries
@@ -146,13 +147,17 @@ export default async function MediaPage() {
               index % 5 === 0 ? 'sm:col-span-2 sm:row-span-2' : ''
             }`}
           >
-            <div className="relative">
-              <img
+            <div
+              className={`relative w-full overflow-hidden ${
+                index % 5 === 0 ? 'aspect-[16/10]' : 'aspect-[4/3]'
+              }`}
+            >
+              <Image
                 src={item.url}
                 alt={item.caption}
-                className={`w-full object-cover transition-transform group-hover:scale-105 ${
-                  index % 5 === 0 ? 'aspect-[16/10]' : 'aspect-[4/3]'
-                }`}
+                fill
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                className="object-cover transition-transform group-hover:scale-105"
               />
               {/* Overlay on Hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
