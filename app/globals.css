@@ -4,48 +4,82 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
+    /* RunExpression Brand Colors */
+    /* Sage Green - Primary brand color for accents, CTAs, trust */
+    --sage-50: 147 15% 95%;
+    --sage-100: 147 15% 88%;
+    --sage-200: 147 15% 76%;
+    --sage-300: 147 20% 64%;
+    --sage-400: 147 25% 52%;
+    --sage-500: 147 30% 40%;    /* Primary sage */
+    --sage-600: 147 35% 32%;
+    --sage-700: 147 40% 24%;
+    --sage-800: 147 45% 16%;
+    --sage-900: 147 50% 10%;
+
+    /* Purple - Energy, flow, transformation */
+    --purple-50: 270 30% 96%;
+    --purple-100: 270 30% 92%;
+    --purple-200: 270 30% 84%;
+    --purple-300: 270 35% 72%;
+    --purple-400: 270 40% 60%;
+    --purple-500: 270 50% 48%;  /* Primary purple */
+    --purple-600: 270 55% 38%;
+    --purple-700: 270 60% 28%;
+    --purple-800: 270 65% 20%;
+    --purple-900: 270 70% 12%;
+
+    /* Cream/Warm Neutrals - Warmth, approachability */
+    --cream-50: 40 25% 98%;
+    --cream-100: 40 25% 95%;
+    --cream-200: 40 20% 90%;
+    --cream-300: 40 15% 85%;
+    --cream-400: 40 12% 75%;
+
+    /* Semantic Tokens (Light Mode) */
+    --background: 40 25% 98%;        /* cream-50 */
+    --foreground: 147 50% 10%;       /* sage-900 - deep sage for text */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 147 50% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 0 0% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 10%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 10%;
+    --popover-foreground: 147 50% 10%;
+    --primary: 147 30% 40%;          /* sage-500 - primary brand actions */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 270 50% 48%;        /* purple-500 - secondary actions */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 40 20% 90%;             /* cream-200 */
+    --muted-foreground: 147 40% 24%; /* sage-700 */
+    --accent: 270 30% 92%;           /* purple-100 - subtle accents */
+    --accent-foreground: 270 70% 12%; /* purple-900 */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 10%;
+    --border: 147 15% 88%;           /* sage-100 */
+    --input: 147 15% 88%;            /* sage-100 */
+    --ring: 147 30% 40%;             /* sage-500 - focus rings */
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 10%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 64%;
-    --accent: 0 0% 15%;
-    --accent-foreground: 0 0% 98%;
+    /* Dark mode: Invert the hierarchy, keep brand colors */
+    --background: 147 50% 10%;       /* sage-900 - dark sage background */
+    --foreground: 40 25% 98%;        /* cream-50 - light text */
+    --card: 147 45% 16%;             /* sage-800 */
+    --card-foreground: 40 25% 98%;
+    --popover: 147 45% 16%;
+    --popover-foreground: 40 25% 98%;
+    --primary: 147 25% 52%;          /* sage-400 - lighter sage for dark bg */
+    --primary-foreground: 147 50% 10%;
+    --secondary: 270 40% 60%;        /* purple-400 - lighter purple */
+    --secondary-foreground: 147 50% 10%;
+    --muted: 147 40% 24%;            /* sage-700 */
+    --muted-foreground: 40 20% 90%;  /* cream-200 */
+    --accent: 270 60% 28%;           /* purple-700 */
+    --accent-foreground: 270 30% 96%; /* purple-50 */
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 0 0% 83%;
+    --border: 147 35% 32%;           /* sage-600 */
+    --input: 147 35% 32%;
+    --ring: 147 25% 52%;             /* sage-400 */
   }
 }
 
@@ -66,5 +100,24 @@
 
   .organic-edges {
     border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  }
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Accessibility: Focus visible for keyboard navigation */
+@layer base {
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }

@@ -1,6 +1,25 @@
 import type { Metadata } from 'next'
-import './globals.css'
 import * as Sentry from '@sentry/nextjs'
+import { DM_Mono, Merriweather } from 'next/font/google'
+
+import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
+
+import './globals.css'
+
+const dmMono = DM_Mono({
+  weight: ['300', '400', '500'],
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+})
+
+const merriweather = Merriweather({
+  weight: ['300', '400', '700', '900'],
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
 
 const baseMetadata: Metadata = {
   title: {
@@ -40,8 +59,6 @@ const baseMetadata: Metadata = {
   },
 }
 
-import { Header } from '@/components/layout/header'
-import { Footer } from '@/components/layout/footer'
 
 export function generateMetadata(): Metadata {
   const traceData = Sentry.getTraceData()
@@ -60,7 +77,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${dmMono.variable} ${merriweather.variable}`}
+    >
       <body className="font-sans antialiased">
         <Header />
         <main>{children}</main>

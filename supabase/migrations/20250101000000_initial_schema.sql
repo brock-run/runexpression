@@ -1,8 +1,8 @@
 -- RunExpression V1 - Initial Database Schema
 -- This migration creates the core tables for the application
 
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Enable UUID extension (preferred in Supabase)
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- =====================================================
 -- PROFILES TABLE
@@ -49,7 +49,7 @@ CREATE POLICY "Users can update their own profile"
 -- Running clubs (DWTC, etc.)
 -- =====================================================
 CREATE TABLE public.clubs (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT NOT NULL,
     slug TEXT UNIQUE NOT NULL,
     description TEXT,
@@ -82,7 +82,7 @@ CREATE POLICY "Public clubs are viewable by everyone"
 -- Links users to clubs with roles
 -- =====================================================
 CREATE TABLE public.club_memberships (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     club_id UUID REFERENCES public.clubs(id) ON DELETE CASCADE NOT NULL,
     role TEXT CHECK (role IN ('admin', 'coach', 'member')) DEFAULT 'member' NOT NULL,
@@ -113,7 +113,7 @@ CREATE INDEX idx_club_memberships_club_id ON public.club_memberships(club_id);
 -- The Flow - where runners express themselves
 -- =====================================================
 CREATE TABLE public.expression_events (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
