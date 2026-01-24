@@ -268,20 +268,23 @@ export async function GET() {
 
 ```typescript
 // app/api/admin/moderate/route.ts
+import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const supabase = createAdminClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // IMPORTANT: Use server client (not admin) to get the authenticated user
+  // The admin client has no session context and getUser() would fail
+  const supabase = createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-  // Verify admin role
-  if (!user) {
+  // Verify user is authenticated
+  if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Check if user is admin (from app_metadata or database)
-  const isAdmin = user.app_metadata?.role === 'admin' || user.role === 'admin'
+  // Check if user is admin (from app_metadata set during signup/by admin)
+  const isAdmin = user.app_metadata?.role === 'admin'
 
   if (!isAdmin) {
     return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 })
@@ -293,7 +296,10 @@ export async function POST(request: Request) {
   const moderation_status = action === 'approve' ? 'approved' : 'rejected'
   const visibility = action === 'approve' ? 'public' : 'private'
 
-  const { data, error } = await supabase
+  // Use admin client for the update to bypass RLS
+  // (moderation updates may need to modify rows the user can't normally access)
+  const adminSupabase = createAdminClient()
+  const { data, error } = await adminSupabase
     .from('expression_events')
     .update({
       moderation_status,
