@@ -69,6 +69,9 @@ const ADR_MAPPINGS = {
   ]
 };
 
+/**
+ * Parse an ADR file into structured metadata.
+ */
 function parseADR(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const filename = path.basename(filePath);
@@ -96,6 +99,9 @@ function parseADR(filePath) {
   };
 }
 
+/**
+ * Create a short summary from an ADR decision section.
+ */
 function extractADRSummary(adr) {
   if (!adr.decision) return null;
   
@@ -109,6 +115,9 @@ function extractADRSummary(adr) {
   return sentences.join(' ');
 }
 
+/**
+ * Inject an ADR reference into skill/agent content.
+ */
 function injectADRReference(content, adr) {
   // Check if ADR section already exists
   const adrSectionRegex = /## Related ADRs?\s*\n([\s\S]*?)(?=\n---|\n## |$)/i;
@@ -134,6 +143,9 @@ function injectADRReference(content, adr) {
   }
 }
 
+/**
+ * Update a skill/agent file with ADR references.
+ */
 function updateSkillOrAgent(filePath, adr) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const updated = injectADRReference(content, adr);
@@ -147,6 +159,9 @@ function updateSkillOrAgent(filePath, adr) {
   return false; // No changes
 }
 
+/**
+ * Sync accepted ADRs into mapped skills and agents.
+ */
 function main() {
   console.log('🔄 Syncing ADRs to skills and agents...\n');
   

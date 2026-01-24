@@ -7,7 +7,7 @@
 CREATE TABLE public.club_contributions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     club_id UUID REFERENCES public.clubs(id) ON DELETE CASCADE NOT NULL,
-    user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL NOT NULL,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
 

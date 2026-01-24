@@ -18,11 +18,11 @@ const buttonVariants = cva(
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
-        // RunExpression brand variants
-        sage: 'bg-sage-500 text-white hover:bg-sage-600 hover:glow-sage transition-all duration-300',
-        purple: 'bg-purple-500 text-white hover:bg-purple-600 hover:glow-purple transition-all duration-300',
+        // RunExpression brand variants (run-* tokens exist in Tailwind config)
+        sage: 'bg-run-primary-500 text-white hover:bg-run-primary-600 hover-glow-sage transition-all duration-300',
+        purple: 'bg-run-accent-500 text-white hover:bg-run-accent-600 hover-glow-purple transition-all duration-300',
         flow: 'flow-gradient text-white hover:opacity-90 hover:scale-105 transition-all duration-300',
-        organic: 'bg-sage-500 text-white hover:bg-sage-600 organic-edges transition-all duration-300',
+        organic: 'bg-run-primary-500 text-white hover:bg-run-primary-600 organic-edges transition-all duration-300',
       },
       size: {
         default: 'h-10 px-4 py-2',
