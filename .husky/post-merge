@@ -3,6 +3,10 @@
 
 # Auto-update Linear issues when merged to main branch
 
+# The post-merge hook receives a single argument: a flag indicating
+# whether the merge was a squash merge (1) or not (0).
+# For fast-forward merges, post-merge still runs but HEAD will have only 1 parent.
+
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Only run on main/master merges

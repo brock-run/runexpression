@@ -44,11 +44,12 @@ import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 
 export function generateMetadata(): Metadata {
+  const traceData = Sentry.getTraceData()
   return {
     ...baseMetadata,
     other: {
       ...(baseMetadata.other ?? {}),
-      ...Sentry.getTraceData(),
+      ...(traceData as Record<string, string>),
     },
   }
 }

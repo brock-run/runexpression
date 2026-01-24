@@ -57,7 +57,7 @@ export default withSentryConfig(nextConfig, {
 
   org: 'run-expression',
 
-  project: 'javascript-nextjs',
+  project: 'runex-website',
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

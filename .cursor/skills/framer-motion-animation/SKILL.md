@@ -459,6 +459,6 @@ const shouldReduceMotion = useReducedMotion()
 ## Additional Resources
 
 - **Framer Motion Docs:** https://www.framer.com/motion/
-- **Project UI Patterns:** See `docs/09-UI-UX-PATTERNS.md` (Section 5: Animation Guidelines)
-- **Brand Guide:** See `docs/04-BRAND-CONTENT-GUIDE.md`
+- **Brand Guide:** See `DOCS/specs/spec-brand-and-content.md`
+- **Tech Design:** See `DOCS/specs/spec-tech-design.md`
 - **Example Implementation:** See `components/home/manifesto-chapters.tsx`

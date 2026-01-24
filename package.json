@@ -5,7 +5,8 @@
   "description": "RunExpression - Where runners express themselves through motion, community, and creative flow",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && npm run sentry:sourcemaps",
+    "build": "next build",
+    "build:sentry": "next build && npm run sentry:sourcemaps",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -18,12 +19,12 @@
     "sync:adrs": "node scripts/sync-adrs-to-skills.js",
     "sync:adrs:dry": "node scripts/sync-adrs-to-skills.js --dry-run",
     "validate:skills": "node scripts/validate-skills-agents.js",
-    "sync:skills": "./convert-skills.sh",
+    "sync:skills": "./scripts/convert-skills.sh",
     "generate:guide": "node scripts/generate-ai-agent-guide.js",
     "skills:list": "ls -1 .cursor/skills",
     "agents:list": "ls -1 .cursor/agents",
     "prepare": "husky",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org run-expression --project javascript-nextjs .next && sentry-cli sourcemaps upload --org run-expression --project javascript-nextjs .next"
+    "sentry:sourcemaps": "node -e \"if(!process.env.SENTRY_ORG||!process.env.SENTRY_PROJECT){console.error('Error: SENTRY_ORG and SENTRY_PROJECT must be set');process.exit(1)}\" && sentry-cli sourcemaps inject --org $SENTRY_ORG --project $SENTRY_PROJECT .next && sentry-cli sourcemaps upload --org $SENTRY_ORG --project $SENTRY_PROJECT .next"
   },
   "dependencies": {
     "@mdx-js/react": "^3.1.0",

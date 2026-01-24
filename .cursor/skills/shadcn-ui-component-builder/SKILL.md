@@ -137,7 +137,12 @@ export { Component, componentVariants }
   role="button"
   tabIndex={0}
   onClick={handleClick}
-  onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault() // Prevent page scroll on Space
+      handleClick()
+    }
+  }}
   aria-label="Submit form"
 >
   Submit

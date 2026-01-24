@@ -1,0 +1,694 @@
+Title,Description,Priority,Labels,Estimate,Parent
+Foundation & Infrastructure,Epic for project setup and core infrastructure,0,epic;foundation,20,
+Project Setup & Configuration,"Initialize Next.js 14+ project with App Router, TypeScript, and core dependencies
+
+Acceptance Criteria:
+- Next.js 14+ project initialized with App Router
+- TypeScript configured with strict mode
+- Tailwind CSS + shadcn/ui installed and configured
+- ESLint and Prettier configured
+- Git repository initialized with .gitignore
+- Environment variables structure defined (.env.example)
+- Package.json scripts configured (dev, build, lint, type-check)",0,foundation;setup,2,Foundation & Infrastructure
+Supabase Project Setup,"Create and configure Supabase project with initial database structure
+
+Acceptance Criteria:
+- Supabase project created
+- Database connection established
+- Supabase client utilities created (client.ts, server.ts, admin.ts)
+- Environment variables configured for Supabase
+- Database types generated (npm run db:types)
+- Row Level Security (RLS) enabled on all tables",0,foundation;backend,3,Foundation & Infrastructure
+Design System & Theme Configuration,"Establish RunExpression brand design system with Tailwind and shadcn/ui
+
+Acceptance Criteria:
+- Custom Tailwind theme configured (sage green, purple, cream colors)
+- Typography system configured (DM Mono, Merriweather)
+- shadcn/ui components installed and customized
+- Custom CSS variables for brand colors defined
+- Animation utilities configured (Framer Motion)
+- Accessibility settings (reduced motion support)",0,foundation;design,3,Foundation & Infrastructure
+Core Database Schema Migration,"Create initial database migration with core tables
+
+Acceptance Criteria:
+- users/profiles table created
+- clubs table created
+- club_memberships table created
+- expression_events table created (for The Flow)
+- club_contributions table created (for Clubhouse)
+- products table created (for Shop)
+- All RLS policies defined
+- Indexes created on foreign keys
+- Migration tested on staging",0,foundation;database,5,Foundation & Infrastructure
+Middleware & Route Protection,"Set up Next.js middleware for auth and route protection
+
+Acceptance Criteria:
+- Supabase auth middleware configured
+- Protected routes identified (clubhouse, admin)
+- Auth callback routes created
+- Session refresh logic implemented
+- Redirect logic for unauthenticated users",0,foundation;auth,2,Foundation & Infrastructure
+Homepage & Manifesto Experience,Epic for homepage and scroll-driven manifesto implementation,0,epic;homepage,25,
+Homepage Layout & Structure,"Create homepage with scroll-driven manifesto structure
+
+Acceptance Criteria:
+- Hero section with H1 'Make running mean more'
+- Scroll-driven layout structure implemented
+- Mobile-responsive layout
+- Navigation header with logo and menu
+- Footer with links and social media
+- Smooth scroll behavior configured",0,homepage;frontend,3,Homepage & Manifesto Experience
+Hero Section with Primary CTA,"Implement hero section with strong visual identity and CTAs
+
+Acceptance Criteria:
+- H1: 'Make running mean more'
+- Sub-headline: 'Turn your struggle into art and feed the running community with your story'
+- Primary CTA: 'Enter the Flow' (links to canvas)
+- Secondary CTA: 'Visit the Clubhouse' (links to DWTC)
+- Background texture/noise effect
+- Typography styling matches brand
+- Mobile-optimized button stacking",0,homepage;frontend;design,2,Homepage & Manifesto Experience
+Chapter 01 - Motion Creates Emotion,"Implement first manifesto chapter with scroll reveal
+
+Acceptance Criteria:
+- Headline: 'Leave heavy. Return light.'
+- Body copy implemented
+- Scroll-triggered fade-in animation
+- Background imagery/texture
+- Soft prompt link: 'Explore the Mindset'
+- Section visible at correct breakpoint",1,homepage;frontend;animation,2,Homepage & Manifesto Experience
+Chapter 02 - Process Over Outcome,"Implement second manifesto chapter
+
+Acceptance Criteria:
+- Headline: 'We take our fun very seriously'
+- Body copy implemented
+- Scroll-triggered animation
+- Soft prompt link: 'Embrace the Grind'
+- Section spacing and rhythm correct",1,homepage;frontend;animation,2,Homepage & Manifesto Experience
+Chapter 03 - Interdependence,"Implement third manifesto chapter
+
+Acceptance Criteria:
+- Headline: 'Your squad is your battery pack'
+- Body copy implemented
+- Scroll-triggered animation
+- Soft prompt link: 'Find Your Crew'
+- Visual treatment consistent with brand",1,homepage;frontend;animation,2,Homepage & Manifesto Experience
+Chapter 04 - Living Laboratory,"Implement fourth manifesto chapter
+
+Acceptance Criteria:
+- Headline: 'Enlightenment smells like laundry'
+- Body copy implemented
+- Scroll-triggered animation
+- Soft prompt link: 'Bring It to Life'
+- Section closes manifesto flow appropriately",1,homepage;frontend;animation,2,Homepage & Manifesto Experience
+The Flow Preview Strip,"Implement live preview of Flow submissions on homepage
+
+Acceptance Criteria:
+- Section title: 'What are we running for today?'
+- Live feed of recent expression_events
+- Horizontal auto-scroll or carousel
+- Touch-swipeable on mobile
+- Realtime updates via Supabase Realtime
+- Sample data displayed when no submissions",1,homepage;frontend;realtime,3,Homepage & Manifesto Experience
+DWTC Clubhouse Teaser,"Implement clubhouse teaser section on homepage
+
+Acceptance Criteria:
+- Section title: 'Welcome to the Laboratory'
+- Body copy about clubhouse
+- CTA button: 'Visit the Clubhouse'
+- Visual treatment (black and white, high grain photography)
+- Section feels distinct but cohesive",1,homepage;frontend;design,2,Homepage & Manifesto Experience
+Homepage Performance Optimization,"Optimize homepage for Core Web Vitals
+
+Acceptance Criteria:
+- LCP < 2s
+- FID < 100ms
+- CLS < 0.1
+- Images optimized (WebP, next/image)
+- Framer Motion animations optimized
+- Lazy loading for below-the-fold content
+- Lighthouse score > 90",1,homepage;performance,3,Homepage & Manifesto Experience
+The Flow (Interactive Canvas),Epic for The Flow interactive canvas feature,0,epic;flow,30,
+Canvas Page Layout & Navigation,"Create main canvas page with navigation and structure
+
+Acceptance Criteria:
+- Route /flow or /canvas created
+- Page layout with header and footer
+- Main prompt: 'What did your run express today?'
+- Helper text: 'It doesn't have to be pretty. Just honest.'
+- Mobile-responsive layout",0,flow;frontend,2,The Flow (Interactive Canvas)
+Expression Submission - Text Input,"Implement text-based expression submission
+
+Acceptance Criteria:
+- Multi-line text input (500-1000 char limit)
+- Character counter
+- Vibe tag selection (5 max)
+- Optional: mood, distance metadata
+- Form validation
+- Submit button with loading state",0,flow;frontend;forms,3,The Flow (Interactive Canvas)
+Expression Submission - Image Upload,"Implement image upload for expressions
+
+Acceptance Criteria:
+- Drag-and-drop or click-to-upload
+- Image preview before submission
+- Client-side compression (compressorjs)
+- File size validation (< 5MB)
+- Caption input field
+- Vibe tag selection
+- Upload to Supabase Storage",0,flow;frontend;upload,3,The Flow (Interactive Canvas)
+Sticker Studio with Fabric.js,"Implement sticker/filter studio for image customization
+
+Acceptance Criteria:
+- Fabric.js canvas initialized
+- Base image loaded as background
+- Sticker picker UI (logo, tape, badges)
+- Drag, rotate, resize sticker controls
+- Filter options (B&W, sepia, normal)
+- Delete selected sticker
+- Export composite image to blob
+- Mobile touch support",1,flow;frontend;canvas,5,The Flow (Interactive Canvas)
+Expression Submission - Backend API,"Create API endpoint for expression submission
+
+Acceptance Criteria:
+- POST /api/expressions/create endpoint
+- User authentication check
+- Payload validation (text, media_url, vibe_tags)
+- OpenAI Moderation API integration
+- Insert into expression_events table
+- Set moderation_status based on trust_score
+- Return success/error response
+- Error handling and logging",0,flow;backend;api,5,The Flow (Interactive Canvas)
+The Flow Wall - Masonry Layout,"Display all approved expressions in masonry grid
+
+Acceptance Criteria:
+- Masonry grid layout (react-masonry-css)
+- Load approved expression_events from Supabase
+- Display text and/or image
+- Show first name/handle and timestamp
+- Hover/tap effects on tiles
+- Empty state with sample expressions
+- Pagination or infinite scroll",0,flow;frontend;layout,3,The Flow (Interactive Canvas)
+Realtime Flow Updates,"Implement realtime updates when new expressions are added
+
+Acceptance Criteria:
+- Supabase Realtime subscription to expression_events
+- New tiles animate into the wall
+- Smooth transition animation
+- No page refresh required
+- Handle connection errors gracefully",1,flow;frontend;realtime,3,The Flow (Interactive Canvas)
+Submission Confirmation & Feedback,"Show user feedback after submission
+
+Acceptance Criteria:
+- Success message: 'Your run just joined the Flow'
+- Animation of new tile drifting into wall
+- Options: 'See the wall', 'Share', 'Sign up/log in'
+- Optimistic UI for logged-in users
+- Pending state message for new users",1,flow;frontend;ux,2,The Flow (Interactive Canvas)
+Vibe Tag Taxonomy & Selection,"Implement vibe tag system for expression categorization
+
+Acceptance Criteria:
+- Vibe tags defined in lib/constants.ts
+- Categories: Mindset, Context, Feeling
+- Tag picker UI component
+- Max 5 tags per expression
+- Tags stored in expression_events.vibe_tags array
+- Tags displayed on expression tiles",1,flow;frontend;taxonomy,2,The Flow (Interactive Canvas)
+DWTC Clubhouse,Epic for DWTC Clubhouse implementation,0,epic;clubhouse,35,
+Clubhouse Route & Auth Gating,"Create clubhouse route with member-only access
+
+Acceptance Criteria:
+- Route /club/dwtc created
+- Auth middleware protects route
+- Redirect to login if not authenticated
+- Check club_memberships table for access
+- 'Access Denied' page for non-members",0,clubhouse;auth,2,DWTC Clubhouse
+Clubhouse Navigation & Layout,"Build clubhouse layout with navigation
+
+Acceptance Criteria:
+- Top-level navigation: Overview, Lore, Media, Resources
+- Persistent 'Add to Archive' button
+- Club-specific branding (DWTC colors, logo)
+- Mobile-responsive sidebar or tabs
+- Footer consistent with main site",0,clubhouse;frontend,3,DWTC Clubhouse
+Overview Page,"Create clubhouse overview/dashboard
+
+Acceptance Criteria:
+- Hero band with club photo
+- Brief 'who we are' story
+- Carousel of recent contributions
+- Featured/pinned content
+- Upcoming events/highlights
+- Navigation to all sections",0,clubhouse;frontend,3,DWTC Clubhouse
+Lore & Stories Section,"Display club lore, race recaps, and stories
+
+Acceptance Criteria:
+- Card-based layout for stories
+- Filter by tag, year, event
+- Load from club_contributions where type='story'
+- Story detail view (title, body, media, author)
+- Inline 'Add yours' prompt
+- Empty state with invitation to contribute",1,clubhouse;frontend,3,DWTC Clubhouse
+Media Archive Gallery,"Display photos and videos in browsable gallery
+
+Acceptance Criteria:
+- Masonry/grid layout for media
+- Load from club_contributions where type='media'
+- Filter by tag, event, date
+- Lightbox view on click
+- Captions and contributor attribution
+- Hover/tap states
+- Inline 'Captured a shot?' prompt",1,clubhouse;frontend,3,DWTC Clubhouse
+Resources Section,"Display club resources (PDFs, training plans, routes)
+
+Acceptance Criteria:
+- Grid/list of documents
+- Load from club_contributions where type='document'
+- File type icons (PDF, JPG, etc.)
+- Title and description
+- Download functionality
+- Filter/search capability",1,clubhouse;frontend,2,DWTC Clubhouse
+Contribution Upload - Choose Type,"Multi-step contribution flow - step 1
+
+Acceptance Criteria:
+- 'Add to Archive' button launches modal/page
+- Three cards: Story, Photo/Video, Document
+- Visual distinction between types
+- Next step on selection",0,clubhouse;frontend;upload,2,DWTC Clubhouse
+Contribution Upload - Story Input,"Story contribution form
+
+Acceptance Criteria:
+- Title input (required)
+- Body text area (required, rich text optional)
+- Optional media attachment
+- Tag selection
+- Event/date picker
+- Preview before submit",0,clubhouse;frontend;forms,3,DWTC Clubhouse
+Contribution Upload - Photo/Video Input,"Media contribution form
+
+Acceptance Criteria:
+- Drag-and-drop or click-to-upload
+- Multiple files supported
+- Client-side compression
+- Caption input (required)
+- Tag selection
+- Event/date picker
+- Preview thumbnails",0,clubhouse;frontend;upload,3,DWTC Clubhouse
+Contribution Upload - Document Input,"Document contribution form
+
+Acceptance Criteria:
+- File upload (PDF, DOC, etc.)
+- File size validation (< 50MB)
+- Title input (required)
+- Description textarea
+- Tag selection
+- Preview file name and size",1,clubhouse;frontend;upload,2,DWTC Clubhouse
+Contribution Upload - Backend API,"Create API endpoint for clubhouse contributions
+
+Acceptance Criteria:
+- POST /api/club_contributions/create endpoint
+- Verify club membership
+- Upload media to Supabase Storage
+- Insert into club_contributions table
+- Set moderation_status = pending
+- Return success with contribution ID
+- Error handling",0,clubhouse;backend;api,5,DWTC Clubhouse
+Contribution Confirmation & Feedback,"Post-upload user feedback
+
+Acceptance Criteria:
+- Success message: 'Your story just joined the DWTC archive'
+- Link to where it will appear
+- Note about approval process
+- Options to add another or view archive",1,clubhouse;frontend;ux,1,DWTC Clubhouse
+Authentication & User Management,Epic for authentication and user management features,0,epic;auth,18,
+Auth Pages - Login,"Create login page with Supabase Auth
+
+Acceptance Criteria:
+- Route /login created
+- Email/password login form
+- Magic link option
+- Social auth (Google optional)
+- 'Forgot password' link
+- Error handling and validation
+- Redirect to origin page after login",0,auth;frontend,2,Authentication & User Management
+Auth Pages - Signup,"Create signup page
+
+Acceptance Criteria:
+- Route /signup created
+- Email, password, full_name fields
+- Password strength indicator
+- Terms of service checkbox
+- Email verification flow
+- Redirect to onboarding after signup",0,auth;frontend,2,Authentication & User Management
+User Onboarding Flow,"Onboarding after first signup
+
+Acceptance Criteria:
+- Welcome screen
+- Profile setup (full_name, avatar optional)
+- 3 questions: 'Current Goal', 'Why do you run?', 'Zip Code'
+- Save to profiles.expression_data JSONB
+- Complete onboarding and redirect to homepage",1,auth;frontend;onboarding,3,Authentication & User Management
+User Profile Page,"User profile view and edit
+
+Acceptance Criteria:
+- Route /profile or /settings
+- Display user info from profiles
+- Edit full_name, avatar
+- View expression history
+- View clubhouse contributions
+- Update profile API endpoint",2,auth;frontend,2,Authentication & User Management
+Password Reset Flow,"Implement password reset
+
+Acceptance Criteria:
+- 'Forgot password' link on login
+- Email input for reset request
+- Send magic link via Supabase
+- Reset password page
+- Confirmation message",2,auth;frontend,2,Authentication & User Management
+Trust Score System,"Implement user trust scoring for moderation
+
+Acceptance Criteria:
+- trust_score field on users table
+- Increment on approved expression
+- Auto-approve logic for trust_score > threshold
+- Admin ability to adjust trust_score",1,auth;backend;moderation,3,Authentication & User Management
+Content Moderation,Epic for content moderation system,0,epic;moderation,12,
+OpenAI Moderation API Integration,"Integrate OpenAI Moderation API for content safety
+
+Acceptance Criteria:
+- OpenAI API key configured
+- API wrapper function in lib/moderation.ts
+- Check text content before saving
+- Handle hate speech, harassment, self-harm flags
+- Hard reject if flagged
+- Log moderation results",0,moderation;backend;api,3,Content Moderation
+Moderation Queue - Backend,"Create moderation status system in database
+
+Acceptance Criteria:
+- moderation_status enum: pending, approved, rejected, flagged
+- visibility_score field (0=hidden, 10=public, 100=featured)
+- Default new submissions to pending
+- Auto-approve for trusted users
+- API endpoint to update moderation status",0,moderation;backend,3,Content Moderation
+Admin Moderation Dashboard,"Build admin UI for content moderation
+
+Acceptance Criteria:
+- Route /admin/moderation (admin-only)
+- List pending expressions and contributions
+- Preview content (text, image, metadata)
+- Approve, Reject, Flag buttons
+- Batch actions support
+- Filter by type, date
+- Pagination",1,moderation;frontend;admin,5,Content Moderation
+Admin Action Logging,"Log all admin moderation actions
+
+Acceptance Criteria:
+- Create admin_actions table
+- Log approve/reject/flag actions
+- Include admin_id, target_id, action, timestamp
+- Admin view of action history",2,moderation;backend;admin,2,Content Moderation
+Shop & Commerce,Epic for shop and e-commerce features,0,epic;shop,22,
+Stripe Account Setup,"Set up Stripe account and webhook endpoints
+
+Acceptance Criteria:
+- Stripe account created
+- API keys configured (test and live)
+- Webhook endpoint created /api/webhooks/stripe
+- Webhook signature verification
+- Handle checkout.session.completed event",1,shop;backend;payments,3,Shop & Commerce
+Products Database & Seeding,"Create products table and seed initial products
+
+Acceptance Criteria:
+- products table with fields: name, description, price, images, stripe_price_id
+- Seed data: greeting cards, t-shirts, digital products
+- API endpoint to list products
+- Product images stored in Supabase Storage",1,shop;backend;database,3,Shop & Commerce
+Shop Product Listing Page,"Display products in grid layout
+
+Acceptance Criteria:
+- Route /shop created
+- Product cards with image, name, price
+- Filter by type (physical, digital)
+- Click to product detail page",1,shop;frontend,2,Shop & Commerce
+Product Detail Page,"Individual product detail view
+
+Acceptance Criteria:
+- Route /shop/[slug] or /shop/[id]
+- Product image gallery
+- Name, description, price
+- Add to cart button
+- Variant selection (size, color) if applicable",1,shop;frontend,3,Shop & Commerce
+Shopping Cart Functionality,"Client-side cart management
+
+Acceptance Criteria:
+- Cart state management (Context or Zustand)
+- Add/remove items
+- Persistent cart (localStorage)
+- Cart icon with item count in header
+- Cart drawer/modal to view items",1,shop;frontend,3,Shop & Commerce
+Stripe Checkout Integration,"Redirect to Stripe hosted checkout
+
+Acceptance Criteria:
+- API endpoint /api/checkout/create-session
+- Create Stripe checkout session with cart items
+- Redirect to Stripe hosted page
+- Success and cancel URLs configured
+- Order record created in database",1,shop;backend;payments,5,Shop & Commerce
+Order Confirmation & Thank You Page,"Post-purchase confirmation
+
+Acceptance Criteria:
+- Route /shop/thank-you or /order/[id]
+- Display order details
+- Confirmation message
+- Email receipt sent
+- Digital product delivery link (if applicable)",1,shop;frontend,2,Shop & Commerce
+AI Coach Hooks & Waitlist,Epic for AI coach touchpoints and waitlist,0,epic;ai-coach,14,
+Define AI Coach Narrative & Copy,"Write copy for AI coach touchpoints across site
+
+Acceptance Criteria:
+- 2-3 sentence description of AI coach vision
+- Homepage section copy
+- Canvas page note copy
+- Clubhouse mention copy
+- Brand voice review completed",2,ai-coach;content,1,AI Coach Hooks & Waitlist
+Homepage AI Coach Teaser Section,"Add AI coach section to homepage
+
+Acceptance Criteria:
+- Section title: 'The Coach That Knows Your Miles and Your Stories'
+- 2-3 lines of copy
+- CTA: 'Join the coach waitlist'
+- Scroll anchor ID for tracking
+- Mobile-responsive",2,ai-coach;frontend;homepage,2,AI Coach Hooks & Waitlist
+Canvas AI Coach Note,"Add AI coach mention on canvas page
+
+Acceptance Criteria:
+- Inline note near input: 'These stories will help shape the future RunExpression AI coach'
+- Tooltip or info icon optional
+- Visible on all breakpoints
+- Analytics event on view",2,ai-coach;frontend;flow,1,AI Coach Hooks & Waitlist
+Clubhouse AI Coach Callout,"Add AI coach mention in clubhouse
+
+Acceptance Criteria:
+- Copy block explaining future coach tie-in
+- Placed near lore or training section
+- Optional CTA to waitlist
+- Consistent visual design",2,ai-coach;frontend;clubhouse,1,AI Coach Hooks & Waitlist
+Waitlist Form UI,"Create waitlist signup form
+
+Acceptance Criteria:
+- Route /coach or /waitlist
+- Email input (required)
+- 'What are you running for?' textarea (optional)
+- 'What guidance do you want?' textarea (optional)
+- Submit button
+- Success message: 'You're in the lab now...'
+- Error handling",2,ai-coach;frontend;forms,2,AI Coach Hooks & Waitlist
+Waitlist Backend & Storage,"Create waitlist API and database
+
+Acceptance Criteria:
+- ai_coach_waitlist table: email, why_running, coach_expectations, source, created_at
+- POST /api/waitlist/create endpoint
+- Rate limiting
+- Duplicate email handling
+- Admin view to export waitlist",2,ai-coach;backend,3,AI Coach Hooks & Waitlist
+AI Coach Analytics Events,"Track AI coach touchpoint engagement
+
+Acceptance Criteria:
+- Events defined: teaser_viewed_homepage, teaser_viewed_canvas, teaser_viewed_clubhouse, waitlist_opened, waitlist_submitted
+- Event tracking helper function
+- Events fire on viewport visibility or click
+- Verify events in analytics tool",2,ai-coach;analytics,2,AI Coach Hooks & Waitlist
+Blog & Content Library,Epic for blog and content library features,0,epic;blog,12,
+MDX Setup & Configuration,"Configure MDX for blog content
+
+Acceptance Criteria:
+- next-mdx-remote installed
+- MDX components configured
+- content/ directory structure
+- Frontmatter parsing (title, date, author, tags)
+- Syntax highlighting configured",2,blog;content,2,Blog & Content Library
+Blog Listing Page,"Display all blog posts
+
+Acceptance Criteria:
+- Route /blog or /library
+- List all posts from content/
+- Post card: title, excerpt, date, author
+- Filter by tag/category
+- Pagination or load more",2,blog;frontend,2,Blog & Content Library
+Blog Post Detail Page,"Individual blog post view
+
+Acceptance Criteria:
+- Route /blog/[slug]
+- Render MDX content
+- Post metadata (title, date, author)
+- Table of contents (optional)
+- Share buttons
+- Related posts",2,blog;frontend,3,Blog & Content Library
+Seed Blog Content,"Create initial blog posts
+
+Acceptance Criteria:
+- 3-5 initial blog posts written
+- Content matches brand voice
+- Images optimized and included
+- SEO metadata for each post",2,blog;content,3,Blog & Content Library
+Testing & QA,Epic for testing and quality assurance,1,epic;testing,18,
+Unit Tests - Core Utilities,"Write unit tests for utility functions
+
+Acceptance Criteria:
+- Test Supabase client utilities
+- Test form validation functions
+- Test data transformation utilities
+- Test coverage > 80% for utils",1,testing;unit-tests,3,Testing & QA
+Integration Tests - API Routes,"Test all API endpoints
+
+Acceptance Criteria:
+- Test expression submission API
+- Test club contribution API
+- Test moderation API
+- Test checkout API
+- Test error handling",1,testing;integration-tests,5,Testing & QA
+E2E Tests - Critical User Flows,"Playwright tests for main user journeys
+
+Acceptance Criteria:
+- Homepage → Canvas submission flow
+- Login → Clubhouse → Upload flow
+- Shop → Checkout flow
+- AI Coach waitlist flow
+- Tests run in CI/CD",1,testing;e2e,5,Testing & QA
+Accessibility Testing,"Ensure WCAG 2.1 AA compliance
+
+Acceptance Criteria:
+- Axe-core automated scans
+- Manual keyboard navigation testing
+- Screen reader testing (NVDA/VoiceOver)
+- Color contrast verification
+- Focus states visible
+- Alt text on all images",1,testing;accessibility,3,Testing & QA
+Performance Testing,"Optimize and test performance
+
+Acceptance Criteria:
+- Lighthouse scores > 90 on all pages
+- Core Web Vitals passing (LCP, FID, CLS)
+- Bundle size analysis
+- Image optimization verification
+- Load testing for 100+ concurrent users",1,testing;performance,3,Testing & QA
+Cross-browser & Device Testing,"Test on multiple browsers and devices
+
+Acceptance Criteria:
+- Chrome, Firefox, Safari, Edge tested
+- Mobile: iOS Safari, Chrome Android
+- Tablet: iPad, Android tablet
+- Responsive breakpoints verified
+- Touch interactions working",1,testing;cross-browser,2,Testing & QA
+Deployment & DevOps,Epic for deployment and DevOps setup,0,epic;devops,20,
+Vercel Project Setup,"Configure Vercel deployment
+
+Acceptance Criteria:
+- Vercel project created
+- GitHub repo connected
+- Environment variables configured
+- Preview deployments enabled
+- Production domain configured",0,devops;deployment,2,Deployment & DevOps
+CI/CD Pipeline,"Set up automated build and test pipeline
+
+Acceptance Criteria:
+- GitHub Actions workflow created
+- Run linting on PR
+- Run type checking on PR
+- Run tests on PR
+- Auto-deploy to preview on PR
+- Auto-deploy to production on merge to main",0,devops;ci-cd,3,Deployment & DevOps
+Environment Configuration,"Set up staging and production environments
+
+Acceptance Criteria:
+- Staging environment on Vercel
+- Production environment on Vercel
+- Separate Supabase projects for staging/prod
+- Environment variables documented
+- Secrets management configured",0,devops;configuration,2,Deployment & DevOps
+Error Monitoring Setup,"Configure Sentry for error tracking
+
+Acceptance Criteria:
+- Sentry project created
+- Sentry SDK installed and configured
+- Client-side error tracking
+- Server-side error tracking
+- Source maps uploaded
+- Alert notifications configured",1,devops;monitoring,3,Deployment & DevOps
+Analytics Setup,"Configure analytics tracking
+
+Acceptance Criteria:
+- Analytics tool selected (GA4, Amplitude, PostHog)
+- Tracking code installed
+- Key events defined and tracked
+- Custom dimensions configured
+- Dashboard created",1,devops;analytics,2,Deployment & DevOps
+Database Backup Strategy,"Set up automated database backups
+
+Acceptance Criteria:
+- Supabase automatic backups enabled
+- Backup retention policy defined
+- Restore procedure documented
+- Test backup restoration",1,devops;database,2,Deployment & DevOps
+Monitoring & Alerting,"Set up uptime and performance monitoring
+
+Acceptance Criteria:
+- Uptime monitoring configured (Vercel or external)
+- Alert notifications for downtime
+- Performance monitoring
+- Database query performance monitoring
+- Disk space and resource alerts",1,devops;monitoring,3,Deployment & DevOps
+Content & Brand,Epic for content and brand assets,1,epic;content,13,
+Copy Review & Brand Voice Alignment,"Review all site copy for brand voice consistency
+
+Acceptance Criteria:
+- All user-facing text reviewed
+- 'Sage in the Parking Lot' voice maintained
+- Error messages humanized
+- Success messages celebrate authentically
+- Content review completed by stakeholder",1,content;brand,3,Content & Brand
+Visual Assets & Photography,"Gather and optimize all visual assets
+
+Acceptance Criteria:
+- Homepage hero image/texture
+- Clubhouse photography
+- Sticker assets for canvas
+- Logo variants (light, dark)
+- All images optimized (WebP)
+- Alt text written",1,content;design,5,Content & Brand
+SEO Optimization,"Optimize site for search engines
+
+Acceptance Criteria:
+- Meta titles and descriptions for all pages
+- Open Graph tags
+- Twitter Card tags
+- Sitemap generated
+- robots.txt configured
+- Schema.org markup (Organization, Article)",1,content;seo,3,Content & Brand
+Legal Pages,"Create required legal pages
+
+Acceptance Criteria:
+- Privacy Policy
+- Terms of Service
+- Cookie Policy (if using cookies)
+- Content linked in footer
+- Legal review completed",1,content;legal,2,Content & Brand
