@@ -1,110 +1,155 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function SignupForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next') ?? '/'
+
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
-    try {
-      const supabase = createClient()
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-          emailRedirectTo: `${window.location.origin}/api/auth/callback`,
-        },
-      })
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      setLoading(false)
+      return
+    }
 
-      if (error) throw error
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      setLoading(false)
+      return
+    }
 
+    const supabase = createClient()
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      },
+    })
+
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+    } else {
       setSuccess(true)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign up')
-    } finally {
       setLoading(false)
     }
   }
 
+  const handleLogin = () => {
+    router.push(`/auth/login?next=${encodeURIComponent(next)}`)
+  }
+
   if (success) {
     return (
-      <div className="rounded-md border border-green-500/20 bg-green-500/10 p-6 text-center">
-        <h3 className="mb-2 text-lg font-semibold text-green-600">
-          Check your email
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          We&apos;ve sent you a verification link. Click it to activate your
-          account.
-        </p>
-      </div>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center space-y-4">
+            <div className="text-4xl">📧</div>
+            <h2 className="font-mono text-xl font-bold">Check your email</h2>
+            <p className="text-sm text-muted-foreground">
+              We sent you a confirmation link. Click it to complete your signup.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-          {error}
-        </div>
-      )}
-      <div className="space-y-2">
-        <Label htmlFor="fullName">Full Name</Label>
-        <Input
-          id="fullName"
-          type="text"
-          placeholder="Your name"
-          value={fullName}
-          onChange={e => setFullName(e.target.value)}
-          required
-          disabled={loading}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
-          disabled={loading}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-          disabled={loading}
-          minLength={6}
-        />
-        <p className="text-xs text-muted-foreground">
-          Must be at least 6 characters
-        </p>
-      </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? 'Creating account...' : 'Create account'}
-      </Button>
-    </form>
+    <Card>
+      <CardHeader>
+        <CardTitle className="font-mono">Create Account</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSignup} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium mb-2">
+              Email
+            </label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium mb-2">
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+              Confirm Password
+            </label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 text-red-800 p-3 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            variant="sage"
+            className="w-full"
+            disabled={loading}
+          >
+            {loading ? 'Creating account...' : 'Sign Up'}
+          </Button>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={handleLogin}
+              className="text-sm text-sage-600 hover:text-sage-800 underline"
+            >
+              Already have an account? Sign in
+            </button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
