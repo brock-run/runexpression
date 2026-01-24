@@ -5,7 +5,7 @@
 -- Clubhouse uploads (lore, media, resources)
 -- =====================================================
 CREATE TABLE public.club_contributions (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     club_id UUID REFERENCES public.clubs(id) ON DELETE CASCADE NOT NULL,
     user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
@@ -95,7 +95,7 @@ CREATE INDEX idx_club_contributions_moderation_status ON public.club_contributio
 -- Shop items (physical and digital)
 -- =====================================================
 CREATE TABLE public.products (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
 
@@ -145,7 +145,7 @@ CREATE INDEX idx_products_is_active ON public.products(is_active);
 -- Purchase records
 -- =====================================================
 CREATE TABLE public.orders (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
@@ -190,7 +190,7 @@ CREATE INDEX idx_orders_created_at ON public.orders(created_at DESC);
 -- Email capture for AI Coach feature
 -- =====================================================
 CREATE TABLE public.ai_coach_waitlist (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
 
     -- Contact info
