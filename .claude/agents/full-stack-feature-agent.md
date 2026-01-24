@@ -555,19 +555,24 @@ export function FlowWall() {
 
 ### Step 4: Real-time Updates
 ```typescript
-// Add Realtime subscription that respects filter
+// Add Realtime subscription with client-side filtering
 useEffect(() => {
   const channel = supabase
     .channel('flow-updates')
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
-      table: 'expression_events',
-      filter: selectedTag 
-        ? `vibe_tags=cs.{${selectedTag}}`
-        : undefined
+      table: 'expression_events'
     }, (payload) => {
-      setPosts(prev => [payload.new, ...prev])
+      // Client-side filtering for vibe tags
+      if (selectedTag) {
+        const vibeTags = payload.new.vibe_tags || []
+        if (vibeTags.includes(selectedTag)) {
+          setPosts(prev => [payload.new, ...prev])
+        }
+      } else {
+        setPosts(prev => [payload.new, ...prev])
+      }
     })
     .subscribe()
 
