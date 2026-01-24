@@ -68,7 +68,7 @@ export function DesignSystemShowcase() {
                   We believe running is not just a physical act; it is a creative one.
                 </p>
                 <p className="font-sans text-base text-run-primary-800 leading-relaxed">
-                  Leave heavy. Return light. It's the most predictable magic trick your body knows.
+                  Leave heavy. Return light. It&apos;s the most predictable magic trick your body knows.
                 </p>
                 <p className="font-sans text-sm text-run-primary-700 leading-relaxed">
                   Your squad is your battery pack. We run together, we transform together.

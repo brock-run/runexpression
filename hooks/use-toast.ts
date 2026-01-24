@@ -131,6 +131,10 @@ export const reducer = (state: State, action: Action): State => {
 
 const listeners: Array<(state: State) => void> = []
 
+export const __testing = {
+  listeners,
+}
+
 let memoryState: State = { toasts: [] }
 
 function dispatch(action: Action) {
@@ -182,7 +186,7 @@ function useToast() {
         listeners.splice(index, 1)
       }
     }
-  }, [state])
+  }, [])
 
   return {
     ...state,
