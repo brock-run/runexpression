@@ -236,15 +236,27 @@ export function MediaGallery({ items }: { items: MediaItem[] }) {
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null)
 
   const navigateNext = () => {
-    if (!selectedItem) return
+    if (!selectedItem || items.length === 0) return
     const currentIndex = items.findIndex(item => item.id === selectedItem.id)
+    // Guard against item not found (e.g., items array was updated)
+    if (currentIndex === -1) {
+      // Item no longer in list - select first item or close
+      setSelectedItem(items[0] ?? null)
+      return
+    }
     const nextIndex = (currentIndex + 1) % items.length
     setSelectedItem(items[nextIndex])
   }
 
   const navigatePrev = () => {
-    if (!selectedItem) return
+    if (!selectedItem || items.length === 0) return
     const currentIndex = items.findIndex(item => item.id === selectedItem.id)
+    // Guard against item not found (e.g., items array was updated)
+    if (currentIndex === -1) {
+      // Item no longer in list - select last item or close
+      setSelectedItem(items[items.length - 1] ?? null)
+      return
+    }
     const prevIndex = (currentIndex - 1 + items.length) % items.length
     setSelectedItem(items[prevIndex])
   }
