@@ -61,14 +61,20 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Public routes that don't require auth
+  const publicPaths = ['/auth', '/', '/flow']
+  const isPublicPath = publicPaths.some(path =>
+    request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')
+  )
+
   // Protected routes
   const protectedPaths = ['/club', '/profile', '/dashboard']
   const isProtectedPath = protectedPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   )
 
-  if (isProtectedPath && !user) {
-    const redirectUrl = new URL('/login', request.url)
+  if (isProtectedPath && !user && !isPublicPath) {
+    const redirectUrl = new URL('/auth/login', request.url)
     redirectUrl.searchParams.set('next', request.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
   }
