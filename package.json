@@ -5,7 +5,8 @@
   "description": "RunExpression - Where runners express themselves through motion, community, and creative flow",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && npm run sentry:sourcemaps",
+    "build": "next build",
+    "build:sentry": "next build && npm run sentry:sourcemaps",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
