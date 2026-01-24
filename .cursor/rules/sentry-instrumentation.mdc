@@ -1,0 +1,14 @@
+---
+description: Sentry instrumentation standards for client and server code
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Sentry Instrumentation Standards
+
+- Import Sentry as `import * as Sentry from "@sentry/nextjs"`.
+- Initialize Sentry only in `instrumentation-client.(ts|js)`, `sentry.server.config.ts`, and `sentry.edge.config.ts`.
+- Capture expected exceptions with `Sentry.captureException(error)` inside `catch` blocks.
+- Create spans with `Sentry.startSpan` for meaningful actions (button clicks, API calls).
+- Use meaningful `op` and `name` values and attach attributes for key context.
+- For logs: `const { logger } = Sentry` and use `logger.fmt` for structured values.

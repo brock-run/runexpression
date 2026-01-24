@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Auto-update Linear issues when merged to main branch
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Only run on main/master merges
+if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
+  # Extract Linear issue ID from last commit message
+  ISSUE_ID=$(git log -1 --pretty=%B | grep -oE '[A-Z]+-[0-9]+' | head -1)
+
+  if [ -n "$ISSUE_ID" ]; then
+    echo ""
+    echo "✅ Merge complete! Updating Linear issue $ISSUE_ID to Done..."
+    echo ""
+
+    # Use Claude to update the issue (headless mode)
+    claude -p "Update Linear issue $ISSUE_ID to 'Done' status and add a comment: 'Merged to main in commit $(git rev-parse --short HEAD)'" \
+      --allowedTools mcp__plugin_linear_linear__update_issue,mcp__plugin_linear_linear__create_comment \
+      --headless 2>/dev/null
+
+    if [ $? -eq 0 ]; then
+      echo "✅ Linear issue $ISSUE_ID updated to Done"
+    else
+      echo "⚠️  Could not update Linear issue $ISSUE_ID (you may need to update manually)"
+    fi
+    echo ""
+  fi
+fi
