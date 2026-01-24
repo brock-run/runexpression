@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import * as Sentry from '@sentry/nextjs'
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: {
     default: 'RunExpression - Express Yourself Through Motion',
     template: '%s | RunExpression',
@@ -41,6 +42,16 @@ export const metadata: Metadata = {
 
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
+
+export function generateMetadata(): Metadata {
+  return {
+    ...baseMetadata,
+    other: {
+      ...(baseMetadata.other ?? {}),
+      ...Sentry.getTraceData(),
+    },
+  }
+}
 
 export default function RootLayout({
   children,
