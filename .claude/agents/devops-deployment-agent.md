@@ -218,6 +218,13 @@ mcp__plugin_linear_linear__update_issue({
 - Monitor error rates and performance metrics
 - Set up alerts for critical errors
 
+### Sentry Instrumentation Standards
+- Use `import * as Sentry from "@sentry/nextjs"`
+- Initialize only in `instrumentation-client`, `sentry.server.config.ts`, `sentry.edge.config.ts`
+- Use `Sentry.captureException` in expected error paths
+- Use `Sentry.startSpan` for meaningful operations (UI, API, jobs)
+- Apply the `sentry-instrumentation` skill for updates
+
 ## Key Skills to Apply
 
 1. **Next.js App Router Specialist (Deployment Patterns)**

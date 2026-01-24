@@ -220,6 +220,13 @@ mcp__plugin_supabase_supabase__execute_sql({
 - Implement loading states during submission
 - Provide success feedback ("Your expression just joined the Flow")
 
+### Sentry Instrumentation
+- Use `import * as Sentry from "@sentry/nextjs"`
+- Capture expected errors with `Sentry.captureException(error)`
+- Add spans with `Sentry.startSpan` for meaningful UI actions
+- Keep initialization in `instrumentation-client.(ts|js)` only
+- Apply the `sentry-instrumentation` skill when adding monitoring
+
 ### Accessibility
 - WCAG 2.1 AA minimum compliance
 - Keyboard navigation support

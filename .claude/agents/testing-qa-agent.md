@@ -244,6 +244,12 @@ mcp__plugin_linear_linear__create_issue({
 - Test API routes with proper Request/Response mocking
 - Handle async Server Component patterns correctly
 
+### Sentry Instrumentation
+- Use `import * as Sentry from "@sentry/nextjs"` in instrumentation examples
+- Validate `Sentry.captureException` usage in error-handling tests
+- Add span coverage guidance for critical flows (`Sentry.startSpan`)
+- Apply the `sentry-instrumentation` skill when test plans touch observability
+
 ## Key Skills to Apply
 
 1. **Testing & QA Automation**
