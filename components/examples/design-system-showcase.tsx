@@ -68,7 +68,7 @@ export function DesignSystemShowcase() {
                   We believe running is not just a physical act; it is a creative one.
                 </p>
                 <p className="font-sans text-base text-run-primary-800 leading-relaxed">
-                  Leave heavy. Return light. It's the most predictable magic trick your body knows.
+                  Leave heavy. Return light. It&apos;s the most predictable magic trick your body knows.
                 </p>
                 <p className="font-sans text-sm text-run-primary-700 leading-relaxed">
                   Your squad is your battery pack. We run together, we transform together.
@@ -368,7 +368,7 @@ export function DesignSystemShowcase() {
             </Card>
 
             {/* Organic Card */}
-            <Card className="border-run-primary-100 bg-run-neutral-0 organic-edges">
+            <Card variant="organic" className="bg-run-neutral-0">
               <CardHeader>
                 <CardTitle className="font-mono text-run-primary-900">
                   Organic Card
@@ -382,7 +382,7 @@ export function DesignSystemShowcase() {
             </Card>
 
             {/* Flow Card */}
-            <Card className="border-run-primary-100 bg-run-neutral-0 organic-edges hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+            <Card variant="flow" className="bg-run-neutral-0">
               <CardHeader>
                 <CardTitle className="font-mono text-run-primary-900">
                   Flow Card
