@@ -5,7 +5,7 @@
   "description": "RunExpression - Where runners express themselves through motion, community, and creative flow",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && npm run sentry:sourcemaps",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -22,7 +22,8 @@
     "generate:guide": "node scripts/generate-ai-agent-guide.js",
     "skills:list": "ls -1 .cursor/skills",
     "agents:list": "ls -1 .cursor/agents",
-    "prepare": "husky"
+    "prepare": "husky",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org run-expression --project javascript-nextjs .next && sentry-cli sourcemaps upload --org run-expression --project javascript-nextjs .next"
   },
   "dependencies": {
     "@mdx-js/react": "^3.1.0",
@@ -30,6 +31,7 @@
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.1",
+    "@sentry/cli": "^2.58.4",
     "@sentry/react": "^10.36.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.6",
