@@ -1,7 +1,11 @@
 import type { Metadata } from 'next'
-import './globals.css'
 import * as Sentry from '@sentry/nextjs'
 import { DM_Mono, Merriweather } from 'next/font/google'
+
+import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
+
+import './globals.css'
 
 const dmMono = DM_Mono({
   weight: ['300', '400', '500'],
@@ -55,8 +59,6 @@ const baseMetadata: Metadata = {
   },
 }
 
-import { Header } from '@/components/layout/header'
-import { Footer } from '@/components/layout/footer'
 
 export function generateMetadata(): Metadata {
   const traceData = Sentry.getTraceData()
