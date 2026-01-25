@@ -9,13 +9,13 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="font-mono text-4xl font-bold text-sage-900 mb-2">
+        <div className="mb-8 text-center">
+          <h1 className="mb-2 font-mono text-4xl font-bold text-run-primary-900">
             Welcome Back
           </h1>
-          <p className="font-sans text-sage-700">
+          <p className="font-sans text-run-primary-700">
             Sign in to continue your expressive running journey
           </p>
         </div>

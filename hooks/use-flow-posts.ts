@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database.types'
 import { PAGINATION } from '@/lib/constants'
@@ -31,7 +31,7 @@ export function useFlowPosts(
   const [hasMore, setHasMore] = useState(true)
   const [offset, setOffset] = useState(0)
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const fetchPosts = useCallback(
     async (reset = false) => {

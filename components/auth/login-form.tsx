@@ -53,7 +53,7 @@ export function LoginForm() {
 
         Sentry.captureException(error, {
           tags: { component: 'login-form' },
-          extra: { email }
+          extra: { email },
         })
       } else {
         router.push(next)
@@ -65,7 +65,7 @@ export function LoginForm() {
 
       Sentry.captureException(err, {
         tags: { component: 'login-form' },
-        extra: { email }
+        extra: { email },
       })
     }
   }
@@ -82,35 +82,38 @@ export function LoginForm() {
       <CardContent>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
+            <label htmlFor="email" className="mb-2 block text-sm font-medium">
               Email
             </label>
             <Input
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-2">
+            <label
+              htmlFor="password"
+              className="mb-2 block text-sm font-medium"
+            >
               Password
             </label>
             <Input
               id="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
               required
             />
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-800 p-3 rounded-md text-sm">
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-800">
               {error}
             </div>
           )}
@@ -128,7 +131,7 @@ export function LoginForm() {
             <button
               type="button"
               onClick={handleSignup}
-              className="text-sm text-sage-600 hover:text-sage-800 underline"
+              className="text-sm text-run-primary-600 underline hover:text-run-primary-800"
             >
               Don&apos;t have an account? Sign up
             </button>
