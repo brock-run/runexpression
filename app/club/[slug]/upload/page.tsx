@@ -86,6 +86,9 @@ export default function UploadPage() {
           setError('Failed to preview image.')
           setSelectedFile(null)
           setFilePreview(null)
+          if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+          }
         }
         reader.readAsDataURL(file)
       }
@@ -134,21 +137,18 @@ export default function UploadPage() {
 
       // Upload file if present
       if (selectedFile) {
-        // Extract file extension with fallback
+        // Extract file extension with fallback - preserve original type including HEIC
         let fileExt = selectedFile.name.includes('.')
           ? selectedFile.name.split('.').pop()
           : null
         if (!fileExt) {
           const mimeExt = selectedFile.type.split('/').pop()
-          fileExt = mimeExt || 'unknown'
-          if (fileExt === 'heic') {
-            fileExt = 'jpg' // HEIC will be converted
+          if (!mimeExt) {
+            throw new Error(
+              'Unable to determine file type. Please try a different file.'
+            )
           }
-        }
-        if (fileExt === 'unknown') {
-          throw new Error(
-            'Unable to determine file type. Please try a different file.'
-          )
+          fileExt = mimeExt
         }
 
         const fileName = `${slug}/${user.id}/${Date.now()}.${fileExt}`

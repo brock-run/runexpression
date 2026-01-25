@@ -1,10 +1,17 @@
 'use client'
 
+/**
+ * Hook and utilities for fetching and managing club contributions.
+ * Provides pagination, filtering by type/tags, and real-time refresh capabilities.
+ * @module hooks/use-club-contributions
+ */
+
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database.types'
 import { PAGINATION } from '@/lib/constants'
 
+/** Club contribution record from the database */
 export type ClubContribution = Tables<'club_contributions'>
 
 export type ContributionType = 'story' | 'media' | 'document'
@@ -26,6 +33,12 @@ interface UseClubContributionsReturn {
   refresh: () => Promise<void>
 }
 
+/**
+ * React hook for fetching club contributions with pagination and filtering.
+ * Handles loading states, error handling, and infinite scroll support.
+ * @param options - Configuration options for the query
+ * @returns Object containing contributions, loading state, error, and control functions
+ */
 export function useClubContributions(
   options: UseClubContributionsOptions
 ): UseClubContributionsReturn {
@@ -121,7 +134,7 @@ export function useClubContributions(
   useEffect(() => {
     fetchContributions(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clubId, type, JSON.stringify(tags), featured])
+  }, [clubId, type, JSON.stringify(tags), featured, initialLimit])
 
   return {
     contributions,
@@ -133,7 +146,11 @@ export function useClubContributions(
   }
 }
 
-// Fetch a single club by slug
+/**
+ * Fetches a single club by its URL slug.
+ * @param slug - The URL-friendly identifier for the club
+ * @returns The club record or null if not found
+ */
 export async function getClubBySlug(slug: string) {
   const supabase = createClient()
   const { data, error } = await supabase

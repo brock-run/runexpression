@@ -1,8 +1,13 @@
 /**
- * Constants for RunExpression application
- * Single source of truth for vibe tags, configuration, etc.
+ * Constants for RunExpression application.
+ * Single source of truth for vibe tags, limits, pagination, and configuration.
+ * @module lib/constants
  */
 
+/**
+ * Categorized vibe tags for user expression and filtering.
+ * Used in onboarding, profile editing, and flow post tagging.
+ */
 export const VIBE_TAGS = {
   MINDSET: [
     'Meditative',

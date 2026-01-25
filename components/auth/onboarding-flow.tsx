@@ -1,5 +1,11 @@
 'use client'
 
+/**
+ * Multi-step onboarding flow for new users.
+ * Guides users through welcome, profile setup, vibe selection, and completion.
+ * @module components/auth/onboarding-flow
+ */
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -14,7 +20,11 @@ import { Loader2 } from 'lucide-react'
 const ONBOARDING_STEPS = ['welcome', 'profile', 'vibes', 'complete'] as const
 type OnboardingStep = (typeof ONBOARDING_STEPS)[number]
 
-export function OnboardingFlow() {
+/**
+ * Multi-step onboarding component that guides new users through profile setup.
+ * Steps: welcome -> profile -> vibes -> complete
+ */
+export function OnboardingFlow(): React.ReactElement {
   const router = useRouter()
   const supabase = createClient()
 
@@ -52,6 +62,20 @@ export function OnboardingFlow() {
     setLoading(true)
     setError(null)
 
+    // Validate inputs before persisting
+    const trimmedName = fullName.trim()
+    if (trimmedName && trimmedName.length > 100) {
+      setError('Name must be 100 characters or less.')
+      setLoading(false)
+      return
+    }
+
+    if (selectedVibes.length > 5) {
+      setError('Please select at most 5 vibes.')
+      setLoading(false)
+      return
+    }
+
     try {
       const {
         data: { user },
@@ -62,12 +86,23 @@ export function OnboardingFlow() {
         return
       }
 
-      // Update profile with onboarding data
+      // Fetch existing profile to preserve expression_data
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('expression_data')
+        .eq('id', user.id)
+        .single()
+
+      const existingData =
+        (existingProfile?.expression_data as Record<string, unknown>) || {}
+
+      // Update profile with onboarding data, merging with existing expression_data
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
-          full_name: fullName || null,
+          full_name: trimmedName || null,
           expression_data: {
+            ...existingData,
             favorite_vibes: selectedVibes,
             onboarding_completed: true,
             onboarding_completed_at: new Date().toISOString(),
@@ -84,6 +119,7 @@ export function OnboardingFlow() {
       router.push('/flow')
       router.refresh()
     } catch (err) {
+      console.error('Onboarding error:', err)
       setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
       setLoading(false)

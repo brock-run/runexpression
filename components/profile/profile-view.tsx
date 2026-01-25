@@ -1,8 +1,15 @@
 'use client'
 
+/**
+ * User profile view and edit component.
+ * Displays user information, vibes, and provides editing capabilities.
+ * @module components/profile/profile-view
+ */
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -24,6 +31,15 @@ type ExpressionData = {
   onboarding_completed?: boolean
   [key: string]: unknown
 }
+
+/** Zod schema for validating profile update inputs */
+const ProfileUpdateSchema = z.object({
+  fullName: z
+    .string()
+    .max(100, 'Name must be 100 characters or less')
+    .optional(),
+  selectedVibes: z.array(z.string()).max(5, 'Maximum 5 vibes allowed'),
+})
 
 export function ProfileView({ profile, user }: ProfileViewProps) {
   const router = useRouter()
@@ -52,6 +68,18 @@ export function ProfileView({ profile, user }: ProfileViewProps) {
     setLoading(true)
     setError(null)
 
+    // Validate input with Zod
+    const validation = ProfileUpdateSchema.safeParse({
+      fullName: fullName || undefined,
+      selectedVibes,
+    })
+
+    if (!validation.success) {
+      setError(validation.error.errors[0]?.message || 'Invalid input')
+      setLoading(false)
+      return
+    }
+
     try {
       const existingData = (profile.expression_data as ExpressionData) || {}
 
@@ -74,6 +102,7 @@ export function ProfileView({ profile, user }: ProfileViewProps) {
       setIsEditing(false)
       router.refresh()
     } catch (err) {
+      console.error('Profile update error:', err)
       setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
       setLoading(false)
@@ -277,7 +306,7 @@ export function ProfileView({ profile, user }: ProfileViewProps) {
               <p className="text-sm text-muted-foreground">••••••••</p>
             </div>
             <Button variant="outline" size="sm" asChild>
-              <a href="/auth/reset-password">Change Password</a>
+              <a href="/auth/forgot-password">Change Password</a>
             </Button>
           </div>
         </CardContent>

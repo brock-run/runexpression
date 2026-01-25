@@ -1,5 +1,12 @@
 -- Trust Score System for RunExpression
--- Tracks user reputation based on community engagement and content quality
+--
+-- Tracks user reputation based on community engagement and content quality.
+-- Trust scores determine user privileges and moderation levels.
+--
+-- Security Model:
+-- - Only service role (via API routes) can modify trust scores
+-- - Users can only view their own trust events
+-- - No authenticated user INSERT policy - prevents score manipulation
 
 -- Add trust_score column to profiles
 ALTER TABLE public.profiles
@@ -38,10 +45,8 @@ CREATE POLICY "Users can view own trust events"
     ON public.trust_score_events FOR SELECT
     USING (auth.uid() = user_id);
 
--- Only service role can insert trust events (via API)
-CREATE POLICY "Service role can insert trust events"
-    ON public.trust_score_events FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+-- No INSERT policy for authenticated users - only service role (which bypasses RLS) can insert
+-- This ensures trust scores can only be modified through server-side API routes
 
 -- Index for user trust events
 CREATE INDEX IF NOT EXISTS idx_trust_score_events_user_id
@@ -94,8 +99,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Grant execute permission to authenticated users
-GRANT EXECUTE ON FUNCTION add_trust_score TO authenticated;
+-- Only service role can execute this function (no grant to authenticated)
+-- Trust scores are managed exclusively through server-side API routes
+REVOKE EXECUTE ON FUNCTION add_trust_score FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION add_trust_score FROM authenticated;
 
 -- Comment on trust score system
 COMMENT ON COLUMN public.profiles.trust_score IS 'User reputation score based on community engagement';
