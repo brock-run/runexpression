@@ -33,6 +33,13 @@ export const VIBE_TAGS = {
   ],
 } as const
 
+// Pre-computed flat array of all vibe tags
+export const ALL_VIBES = [
+  ...VIBE_TAGS.MINDSET,
+  ...VIBE_TAGS.CONTEXT,
+  ...VIBE_TAGS.FEELING,
+] as const
+
 export const EXPRESSION_TYPES = {
   TEXT: 'text',
   IMAGE: 'image',

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database.types'
 import { PAGINATION } from '@/lib/constants'
@@ -41,7 +41,7 @@ export function useClubContributions(
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
   const [hasMore, setHasMore] = useState(true)
-  const [offset, setOffset] = useState(0)
+  const offsetRef = useRef(0)
 
   const supabase = useMemo(() => createClient(), [])
 
@@ -51,7 +51,7 @@ export function useClubContributions(
         setIsLoading(true)
         setError(null)
 
-        const currentOffset = reset ? 0 : offset
+        const currentOffset = reset ? 0 : offsetRef.current
         const limit = reset
           ? initialLimit
           : PAGINATION.CLUBHOUSE_LOAD_MORE || initialLimit
@@ -88,10 +88,10 @@ export function useClubContributions(
 
         if (reset) {
           setContributions(data || [])
-          setOffset(limit)
+          offsetRef.current = limit
         } else {
           setContributions(prev => [...prev, ...(data || [])])
-          setOffset(prev => prev + limit)
+          offsetRef.current += limit
         }
 
         setHasMore((data?.length || 0) >= limit)
@@ -105,7 +105,7 @@ export function useClubContributions(
         setIsLoading(false)
       }
     },
-    [supabase, clubId, type, tags, featured, offset, initialLimit]
+    [supabase, clubId, type, tags, featured, initialLimit]
   )
 
   const loadMore = useCallback(async () => {
@@ -114,7 +114,7 @@ export function useClubContributions(
   }, [fetchContributions, hasMore, isLoading])
 
   const refresh = useCallback(async () => {
-    setOffset(0)
+    offsetRef.current = 0
     await fetchContributions(true)
   }, [fetchContributions])
 

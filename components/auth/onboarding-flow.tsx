@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { VIBE_TAGS } from '@/lib/constants'
+import { ALL_VIBES } from '@/lib/constants'
 import { Loader2 } from 'lucide-react'
 
 const ONBOARDING_STEPS = ['welcome', 'profile', 'vibes', 'complete'] as const
@@ -23,12 +23,6 @@ export function OnboardingFlow() {
   const [selectedVibes, setSelectedVibes] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  const allVibes = [
-    ...VIBE_TAGS.MINDSET,
-    ...VIBE_TAGS.CONTEXT,
-    ...VIBE_TAGS.FEELING,
-  ]
 
   const toggleVibe = (vibe: string) => {
     setSelectedVibes(prev =>
@@ -194,7 +188,7 @@ export function OnboardingFlow() {
             </p>
 
             <div className="flex flex-wrap gap-2">
-              {allVibes.map(vibe => (
+              {ALL_VIBES.map(vibe => (
                 <Badge
                   key={vibe}
                   variant={selectedVibes.includes(vibe) ? 'default' : 'outline'}

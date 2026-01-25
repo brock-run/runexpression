@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { VIBE_TAGS } from '@/lib/constants'
+import { ALL_VIBES } from '@/lib/constants'
 import type { Tables } from '@/types/database.types'
 import type { User } from '@supabase/supabase-js'
 import { Loader2, Pencil, X, Check, Camera } from 'lucide-react'
@@ -37,12 +37,6 @@ export function ProfileView({ profile, user }: ProfileViewProps) {
   const [selectedVibes, setSelectedVibes] = useState<string[]>(
     (profile.expression_data as ExpressionData)?.favorite_vibes || []
   )
-
-  const allVibes = [
-    ...VIBE_TAGS.MINDSET,
-    ...VIBE_TAGS.CONTEXT,
-    ...VIBE_TAGS.FEELING,
-  ]
 
   const toggleVibe = (vibe: string) => {
     setSelectedVibes(prev =>
@@ -192,7 +186,7 @@ export function ProfileView({ profile, user }: ProfileViewProps) {
                 Select up to 5 vibes that describe your running style.
               </p>
               <div className="flex flex-wrap gap-2">
-                {allVibes.map(vibe => (
+                {ALL_VIBES.map(vibe => (
                   <Badge
                     key={vibe}
                     variant={
