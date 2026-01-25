@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ALL_VIBES } from '@/lib/constants'
+import { cn } from '@/lib/utils'
 import type { Tables } from '@/types/database.types'
 import type { User } from '@supabase/supabase-js'
 import { Loader2, Pencil, X, Check, Camera } from 'lucide-react'
@@ -26,7 +27,7 @@ interface ProfileViewProps {
   user: User
 }
 
-type ExpressionData = {
+interface ExpressionData {
   favorite_vibes?: string[]
   onboarding_completed?: boolean
   [key: string]: unknown
@@ -41,7 +42,7 @@ const ProfileUpdateSchema = z.object({
   selectedVibes: z.array(z.string()).max(5, 'Maximum 5 vibes allowed'),
 })
 
-export function ProfileView({ profile, user }: ProfileViewProps) {
+export function ProfileView({ profile, user }: ProfileViewProps): JSX.Element {
   const router = useRouter()
   const supabase = createClient()
 
@@ -221,11 +222,12 @@ export function ProfileView({ profile, user }: ProfileViewProps) {
                     variant={
                       selectedVibes.includes(vibe) ? 'default' : 'outline'
                     }
-                    className={`cursor-pointer px-3 py-1.5 text-sm transition-colors ${
+                    className={cn(
+                      'cursor-pointer px-3 py-1.5 text-sm transition-colors',
                       selectedVibes.includes(vibe)
                         ? 'bg-orange-600 hover:bg-orange-700'
                         : 'hover:bg-orange-50 hover:text-orange-600'
-                    }`}
+                    )}
                     onClick={() => toggleVibe(vibe)}
                   >
                     {vibe}

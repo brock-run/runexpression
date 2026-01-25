@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS public.trust_score_events (
     )),
     points INTEGER NOT NULL,
     description TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
 -- RLS for trust_score_events
@@ -87,6 +88,9 @@ CREATE OR REPLACE FUNCTION add_trust_score(
 )
 RETURNS void AS $$
 BEGIN
+    -- Set safe search_path to prevent object-name hijacking
+    PERFORM set_config('search_path', 'public, pg_temp', true);
+
     -- Insert event log
     INSERT INTO public.trust_score_events (user_id, event_type, points, description)
     VALUES (p_user_id, p_event_type, p_points, p_description);

@@ -8,6 +8,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,6 +20,15 @@ import { Loader2 } from 'lucide-react'
 
 const ONBOARDING_STEPS = ['welcome', 'profile', 'vibes', 'complete'] as const
 type OnboardingStep = (typeof ONBOARDING_STEPS)[number]
+
+/** Zod schema for validating onboarding inputs */
+const OnboardingSchema = z.object({
+  fullName: z
+    .string()
+    .max(100, 'Name must be 100 characters or less')
+    .nullable(),
+  selectedVibes: z.array(z.string()).max(5, 'Please select at most 5 vibes'),
+})
 
 /**
  * Multi-step onboarding component that guides new users through profile setup.
@@ -62,16 +72,15 @@ export function OnboardingFlow(): React.ReactElement {
     setLoading(true)
     setError(null)
 
-    // Validate inputs before persisting
+    // Validate inputs with Zod
     const trimmedName = fullName.trim()
-    if (trimmedName && trimmedName.length > 100) {
-      setError('Name must be 100 characters or less.')
-      setLoading(false)
-      return
-    }
+    const validation = OnboardingSchema.safeParse({
+      fullName: trimmedName || null,
+      selectedVibes,
+    })
 
-    if (selectedVibes.length > 5) {
-      setError('Please select at most 5 vibes.')
+    if (!validation.success) {
+      setError(validation.error.errors[0]?.message || 'Invalid input')
       setLoading(false)
       return
     }
@@ -87,11 +96,16 @@ export function OnboardingFlow(): React.ReactElement {
       }
 
       // Fetch existing profile to preserve expression_data
-      const { data: existingProfile } = await supabase
+      const { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
         .select('expression_data')
         .eq('id', user.id)
         .single()
+
+      if (fetchError) {
+        console.error('Failed to fetch existing profile:', fetchError)
+        throw new Error('Failed to load profile. Please try again.')
+      }
 
       const existingData =
         (existingProfile?.expression_data as Record<string, unknown>) || {}
@@ -100,10 +114,10 @@ export function OnboardingFlow(): React.ReactElement {
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
-          full_name: trimmedName || null,
+          full_name: validation.data.fullName,
           expression_data: {
             ...existingData,
-            favorite_vibes: selectedVibes,
+            favorite_vibes: validation.data.selectedVibes,
             onboarding_completed: true,
             onboarding_completed_at: new Date().toISOString(),
           },

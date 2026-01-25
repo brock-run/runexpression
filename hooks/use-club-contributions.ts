@@ -151,7 +151,9 @@ export function useClubContributions(
  * @param slug - The URL-friendly identifier for the club
  * @returns The club record or null if not found
  */
-export async function getClubBySlug(slug: string) {
+export async function getClubBySlug(
+  slug: string
+): Promise<Tables<'clubs'> | null> {
   const supabase = createClient()
   const { data, error } = await supabase
     .from('clubs')
