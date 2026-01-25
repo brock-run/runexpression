@@ -121,7 +121,7 @@ export function useClubContributions(
   useEffect(() => {
     fetchContributions(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clubId, type, tags?.join(','), featured])
+  }, [clubId, type, JSON.stringify(tags), featured])
 
   return {
     contributions,

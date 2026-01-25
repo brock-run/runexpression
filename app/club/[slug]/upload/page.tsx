@@ -131,7 +131,15 @@ export default function UploadPage() {
           : null
         if (!fileExt) {
           const mimeExt = selectedFile.type.split('/').pop()
-          fileExt = mimeExt && mimeExt !== 'heic' ? mimeExt : 'bin'
+          fileExt = mimeExt || 'unknown'
+          if (fileExt === 'heic') {
+            fileExt = 'jpg' // HEIC will be converted
+          }
+        }
+        if (fileExt === 'unknown') {
+          throw new Error(
+            'Unable to determine file type. Please try a different file.'
+          )
         }
 
         const fileName = `${slug}/${user.id}/${Date.now()}.${fileExt}`
