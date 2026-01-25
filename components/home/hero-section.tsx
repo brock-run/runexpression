@@ -39,7 +39,7 @@ export function HeroSection() {
           </Link>
         </div>
 
-        {/* Optional scroll indicator */}
+        {/* Optional scroll indicator - purely decorative */}
         <div
           className="mt-16 animate-bounce motion-reduce:animate-none md:mt-20"
           aria-hidden="true"
@@ -52,8 +52,6 @@ export function HeroSection() {
             strokeWidth="2"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            aria-label="Scroll down to explore"
-            role="img"
           >
             <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
           </svg>

@@ -77,6 +77,12 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
       reader.onloadend = () => {
         setImagePreview(reader.result as string)
       }
+      reader.onerror = () => {
+        console.error('Failed to read image file')
+        setError('Failed to read image. Please try again.')
+        setSelectedImage(null)
+        setImagePreview(null)
+      }
       reader.readAsDataURL(file)
     },
     []
@@ -110,7 +116,15 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
 
       // Upload image if present
       if (selectedImage) {
-        const fileExt = selectedImage.name.split('.').pop()
+        // Extract file extension, falling back to MIME type if no extension in filename
+        let fileExt = selectedImage.name.includes('.')
+          ? selectedImage.name.split('.').pop()
+          : null
+        if (!fileExt) {
+          // Fall back to MIME type (e.g., 'image/jpeg' -> 'jpeg')
+          const mimeExt = selectedImage.type.split('/').pop()
+          fileExt = mimeExt && mimeExt !== 'heic' ? mimeExt : 'jpg'
+        }
         const fileName = `${user.id}/${Date.now()}.${fileExt}`
 
         const { error: uploadError } = await supabase.storage
@@ -265,15 +279,25 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
                     size="icon"
                     className="absolute right-2 top-2"
                     onClick={removeImage}
+                    aria-label="Remove uploaded image"
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
               ) : (
                 <div
+                  role="button"
+                  tabIndex={0}
                   onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      fileInputRef.current?.click()
+                    }
+                  }}
+                  aria-label="Upload an image. JPEG, PNG, or HEIC, maximum 5 megabytes."
                   className={cn(
-                    'flex aspect-video cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border transition-colors hover:border-primary hover:bg-muted/50'
+                    'flex aspect-video cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border transition-colors hover:border-primary hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
                   )}
                 >
                   <Upload className="mb-2 h-8 w-8 text-muted-foreground" />

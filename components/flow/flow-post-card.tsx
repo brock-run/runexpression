@@ -20,11 +20,16 @@ export function FlowPostCard({ post, className }: FlowPostCardProps) {
   const hasImage = post.type === 'image' || post.type === 'photo_text'
   const hasText = post.content || post.content_long
 
-  // Format the date
-  const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  })
+  // Format the date - handle null/malformed values
+  const formattedDate = (() => {
+    if (!post.created_at) return null
+    const date = new Date(post.created_at)
+    if (isNaN(date.getTime())) return null
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    })
+  })()
 
   return (
     <motion.div
@@ -98,9 +103,11 @@ export function FlowPostCard({ post, className }: FlowPostCardProps) {
           )}
 
           {/* Footer */}
-          <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-            <time dateTime={post.created_at}>{formattedDate}</time>
-          </div>
+          {formattedDate && (
+            <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+              <time dateTime={post.created_at}>{formattedDate}</time>
+            </div>
+          )}
         </CardContent>
       </Card>
     </motion.div>
