@@ -1,12 +1,25 @@
-import { NextRequest } from 'next/server'
-import { GET } from './route'
-import { getClubBySlug, getClubContributions } from '@/lib/clubhouse/queries'
+/**
+ * @jest-environment node
+ */
+
+// Mock env module FIRST to prevent ESM import issues with @t3-oss/env-nextjs
+jest.mock('@/env', () => ({
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: 'http://localhost:54321',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
+    SUPABASE_SERVICE_ROLE_KEY: 'test-service-key',
+  },
+}))
 
 jest.mock('@/lib/clubhouse/queries')
 jest.mock('@sentry/nextjs', () => ({
   startSpan: (_context: unknown, callback: () => unknown) => callback(),
   captureException: jest.fn(),
 }))
+
+import { NextRequest } from 'next/server'
+import { GET } from './route'
+import { getClubBySlug, getClubContributions } from '@/lib/clubhouse/queries'
 
 const mockedGetClubBySlug = getClubBySlug as jest.MockedFunction<typeof getClubBySlug>
 const mockedGetClubContributions = getClubContributions as jest.MockedFunction<
