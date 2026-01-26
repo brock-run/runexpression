@@ -18,7 +18,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { VibeTagSelector } from './vibe-tag-selector'
 import { TEXT_LIMITS, FILE_UPLOAD_LIMITS } from '@/lib/constants'
-import { Loader2, Plus, Upload, X, ImageIcon, Type } from 'lucide-react'
+import { maybeCompressImage } from '@/lib/image-compression'
+import { Loader2, Plus, Upload, X, ImageIcon, Type, CheckCircle, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SubmissionDialogProps {
@@ -35,6 +36,10 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [submitSuccess, setSubmitSuccess] = useState<{
+    autoApproved: boolean
+    message: string
+  } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const router = useRouter()
@@ -47,6 +52,7 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
     setSelectedImage(null)
     setImagePreview(null)
     setError(null)
+    setSubmitSuccess(null)
     setActiveTab('text')
   }, [])
 
@@ -120,15 +126,21 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
 
       let mediaUrl: string | null = null
 
-      // Upload image if present
+      // Upload image if present (still happens client-side to Supabase Storage)
       if (selectedImage) {
-        // Extract file extension, falling back to MIME type if no extension in filename
-        let fileExt = selectedImage.name.includes('.')
-          ? selectedImage.name.split('.').pop()
+        // Compress image before upload to reduce storage and improve performance
+        const { file: imageToUpload } = await maybeCompressImage(selectedImage, {
+          maxDimension: 2048,
+          quality: 0.85,
+        })
+
+        // Extract file extension from the (possibly compressed) file
+        let fileExt = imageToUpload.name.includes('.')
+          ? imageToUpload.name.split('.').pop()
           : null
         if (!fileExt) {
-          // Fall back to MIME type (e.g., 'image/jpeg' -> 'jpeg', 'image/heic' -> 'heic')
-          const mimeExt = selectedImage.type.split('/').pop()
+          // Fall back to MIME type (e.g., 'image/jpeg' -> 'jpeg')
+          const mimeExt = imageToUpload.type.split('/').pop()
           if (!mimeExt) {
             throw new Error('Unable to determine file type. Please try again.')
           }
@@ -138,7 +150,7 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
 
         const { error: uploadError } = await supabase.storage
           .from('flow-media')
-          .upload(fileName, selectedImage, {
+          .upload(fileName, imageToUpload, {
             cacheControl: '3600',
             upsert: false,
           })
@@ -163,29 +175,42 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
         type = 'image'
       }
 
-      // Create expression event
-      const { error: insertError } = await supabase
-        .from('expression_events')
-        .insert({
-          user_id: user.id,
+      // Submit through API with server-side moderation
+      const response = await fetch('/api/flow/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           type,
           content: content || null,
           content_long: contentLong || null,
           media_url: mediaUrl,
           vibe_tags: selectedTags.length > 0 ? selectedTags : null,
-          moderation_status: 'pending',
-          visibility: 'pending',
-        })
+        }),
+      })
 
-      if (insertError) {
-        throw new Error('Failed to submit. Please try again.')
+      const result = await response.json()
+
+      if (!response.ok) {
+        // Handle moderation rejection with user-friendly message
+        if (result.moderation_flagged) {
+          throw new Error(
+            result.error ||
+              "Your submission couldn't be posted. Please ensure your content is respectful and appropriate."
+          )
+        }
+        throw new Error(result.error || 'Failed to submit. Please try again.')
       }
 
-      // Success
-      resetForm()
-      setOpen(false)
-
-      // Show success message or refresh
+      // Success - show appropriate message based on moderation status
+      const isAutoApproved = result.data?.moderation_status === 'approved'
+      setSubmitSuccess({
+        autoApproved: isAutoApproved,
+        message: isAutoApproved
+          ? 'Your expression is now live in the Flow!'
+          : 'Your submission is pending review and will appear shortly.',
+      })
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
@@ -210,17 +235,53 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
       </DialogTrigger>
 
       <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="font-mono text-2xl">
-            Share Your Flow
-          </DialogTitle>
-          <DialogDescription>
-            What are you running for today? Your submission will be reviewed
-            before appearing.
-          </DialogDescription>
-        </DialogHeader>
+        {submitSuccess ? (
+          // Success view
+          <div className="flex flex-col items-center py-8 text-center">
+            {submitSuccess.autoApproved ? (
+              <CheckCircle className="mb-4 h-16 w-16 text-green-500" />
+            ) : (
+              <Clock className="mb-4 h-16 w-16 text-orange-500" />
+            )}
+            <DialogTitle className="mb-2 font-mono text-2xl">
+              {submitSuccess.autoApproved ? 'Posted!' : 'Submitted!'}
+            </DialogTitle>
+            <DialogDescription className="mb-6 text-base">
+              {submitSuccess.message}
+            </DialogDescription>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resetForm()
+                }}
+              >
+                Post Another
+              </Button>
+              <Button
+                onClick={() => {
+                  resetForm()
+                  setOpen(false)
+                }}
+              >
+                Done
+              </Button>
+            </div>
+          </div>
+        ) : (
+          // Submission form
+          <>
+            <DialogHeader>
+              <DialogTitle className="font-mono text-2xl">
+                Share Your Flow
+              </DialogTitle>
+              <DialogDescription>
+                What are you running for today? Your submission will be reviewed
+                before appearing.
+              </DialogDescription>
+            </DialogHeader>
 
-        <Tabs
+            <Tabs
           value={activeTab}
           onValueChange={v => setActiveTab(v as 'text' | 'image')}
           className="mt-4"
@@ -366,21 +427,23 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
         )}
 
         {/* Submit button */}
-        <div className="mt-6 flex justify-end gap-3">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit || isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              'Submit'
-            )}
-          </Button>
-        </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSubmit} disabled={!canSubmit || isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit'
+                )}
+              </Button>
+            </div>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )

@@ -14,6 +14,7 @@ import {
   TEXT_LIMITS,
   FILE_UPLOAD_LIMITS,
 } from '@/lib/constants'
+import { maybeCompressImage } from '@/lib/image-compression'
 import { Loader2, Upload, X, ArrowLeft } from 'lucide-react'
 
 type ContributionType = 'story' | 'media' | 'document' | ''
@@ -137,12 +138,25 @@ export default function UploadPage() {
 
       // Upload file if present
       if (selectedFile) {
-        // Extract file extension with fallback - preserve original type including HEIC
-        let fileExt = selectedFile.name.includes('.')
-          ? selectedFile.name.split('.').pop()
+        // Compress images before upload (documents are uploaded as-is)
+        let fileToUpload = selectedFile
+        if (contributionType === 'media') {
+          const { file: compressedFile } = await maybeCompressImage(
+            selectedFile,
+            {
+              maxDimension: 2048,
+              quality: 0.85,
+            }
+          )
+          fileToUpload = compressedFile
+        }
+
+        // Extract file extension with fallback
+        let fileExt = fileToUpload.name.includes('.')
+          ? fileToUpload.name.split('.').pop()
           : null
         if (!fileExt) {
-          const mimeExt = selectedFile.type.split('/').pop()
+          const mimeExt = fileToUpload.type.split('/').pop()
           if (!mimeExt) {
             throw new Error(
               'Unable to determine file type. Please try a different file.'
@@ -155,7 +169,7 @@ export default function UploadPage() {
 
         const { error: uploadError } = await supabase.storage
           .from('club-contributions')
-          .upload(fileName, selectedFile, {
+          .upload(fileName, fileToUpload, {
             cacheControl: '3600',
             upsert: false,
           })
@@ -170,8 +184,8 @@ export default function UploadPage() {
         } = supabase.storage.from('club-contributions').getPublicUrl(fileName)
 
         mediaUrl = publicUrl
-        fileSize = selectedFile.size
-        fileType = selectedFile.type
+        fileSize = fileToUpload.size
+        fileType = fileToUpload.type
       }
 
       // Parse tags

@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs basename:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(xargs -I {} bash -c 'echo \"\"\"\"=== {} ===\"\"\"\" && head -20 {}')",
+      "Bash(claude mcp list:*)",
+      "Bash(env)",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: implement epic gap fixes for RUN-6, RUN-7, RUN-8, RUN-9\n\n- Add /library and /shop placeholder pages \\(fixes broken nav links\\)\n- Add \"Forgot password?\" link to login form\n- Implement OpenAI Moderation API integration for Flow submissions\n  - Create lib/moderation.ts for content moderation\n  - Add /api/flow/submit server-side API route\n  - Integrate trust score-based auto-approval\n- Replace all Clubhouse mock data with real database queries\n  - Create lib/clubhouse/queries.ts for server-side data fetching\n  - Update Overview, Lore, Media, Resources pages\n  - Update story detail page\n  - Add proper empty states for all sections\n- Install openai package for moderation\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(npm run lint:*)",
+      "Bash(npm run test:ci:*)"
+    ]
+  }
+}

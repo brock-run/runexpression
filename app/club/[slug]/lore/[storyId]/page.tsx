@@ -2,9 +2,127 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { notFound } from 'next/navigation'
+import { ReactNode } from 'react'
 
 interface StoryDetailPageProps {
   params: Promise<{ slug: string; storyId: string }>
+}
+
+/**
+ * Safely renders text with markdown-style bold markers (**text**) as React elements.
+ * Escapes all HTML to prevent XSS attacks.
+ */
+function renderTextWithBold(text: string): ReactNode[] {
+  const parts: ReactNode[] = []
+  let currentIndex = 0
+  let keyCounter = 0
+
+  // Find all **text** patterns
+  const boldPattern = /\*\*([^*]+)\*\*/g
+  let match: RegExpExecArray | null
+
+  while ((match = boldPattern.exec(text)) !== null) {
+    // Add text before the match
+    if (match.index > currentIndex) {
+      const textBefore = text.slice(currentIndex, match.index)
+      parts.push(textBefore)
+    }
+
+    // Add the bold text
+    parts.push(
+      <strong key={`bold-${keyCounter++}`}>{match[1]}</strong>
+    )
+
+    currentIndex = match.index + match[0].length
+  }
+
+  // Add remaining text
+  if (currentIndex < text.length) {
+    parts.push(text.slice(currentIndex))
+  }
+
+  return parts.length > 0 ? parts : [text]
+}
+
+/**
+ * Safely renders a markdown-style paragraph as React elements.
+ * Handles headings, lists, horizontal rules, and paragraphs without using dangerouslySetInnerHTML.
+ */
+function renderParagraph(paragraph: string, index: number): ReactNode {
+  const escapeHtml = (str: string): string => {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+  }
+
+  // H1 heading
+  if (paragraph.startsWith('# ')) {
+    const content = paragraph.slice(2)
+    return (
+      <h1 key={index} className="text-3xl font-bold mb-4">
+        {escapeHtml(content)}
+      </h1>
+    )
+  }
+
+  // H2 heading
+  if (paragraph.startsWith('## ')) {
+    const content = paragraph.slice(3)
+    return (
+      <h2 key={index} className="text-2xl font-bold mb-3 mt-8">
+        {escapeHtml(content)}
+      </h2>
+    )
+  }
+
+  // Unordered list
+  if (paragraph.startsWith('- ')) {
+    const items = paragraph
+      .split('\n')
+      .filter((line) => line.startsWith('- '))
+      .map((line, i) => (
+        <li key={`${index}-${i}`}>{renderTextWithBold(line.slice(2))}</li>
+      ))
+
+    return (
+      <ul key={index} className="list-disc list-inside space-y-2 my-4">
+        {items}
+      </ul>
+    )
+  }
+
+  // Italic centered text (e.g., *text*) - exclude bold markers (**text**)
+  if (
+    paragraph.startsWith('*') &&
+    paragraph.endsWith('*') &&
+    !paragraph.startsWith('**') &&
+    !paragraph.endsWith('**')
+  ) {
+    const content = paragraph.slice(1, -1)
+    return (
+      <p
+        key={index}
+        className="italic text-center text-muted-foreground my-8"
+      >
+        {escapeHtml(content)}
+      </p>
+    )
+  }
+
+  // Horizontal rule
+  if (paragraph.startsWith('---')) {
+    return <hr key={index} className="my-8 border-t border-border" />
+  }
+
+  // Regular paragraph with bold support
+  return (
+    <p key={index} className="leading-relaxed">
+      {renderTextWithBold(paragraph)}
+    </p>
+  )
 }
 
 export default async function StoryDetailPage({
@@ -115,38 +233,11 @@ But also, it's definitely about the bacon.
 
       {/* Story Body */}
       <article className="prose prose-lg max-w-none">
-        {/* In a real app, this would use a markdown parser like react-markdown */}
-        <div
-          className="space-y-6 text-run-gray-900"
-          dangerouslySetInnerHTML={{
-            __html: story.body
-              .split('\n\n')
-              .map((paragraph) => {
-                if (paragraph.startsWith('# ')) {
-                  return `<h1 class="text-3xl font-bold mb-4">${paragraph.slice(2)}</h1>`
-                }
-                if (paragraph.startsWith('## ')) {
-                  return `<h2 class="text-2xl font-bold mb-3 mt-8">${paragraph.slice(3)}</h2>`
-                }
-                if (paragraph.startsWith('- ')) {
-                  const items = paragraph
-                    .split('\n')
-                    .filter((line) => line.startsWith('- '))
-                    .map((line) => `<li>${line.slice(2)}</li>`)
-                    .join('')
-                  return `<ul class="list-disc list-inside space-y-2 my-4">${items}</ul>`
-                }
-                if (paragraph.startsWith('*') && paragraph.endsWith('*')) {
-                  return `<p class="italic text-center text-muted-foreground my-8">${paragraph.slice(1, -1)}</p>`
-                }
-                if (paragraph.startsWith('---')) {
-                  return '<hr class="my-8 border-t border-border" />'
-                }
-                return `<p class="leading-relaxed">${paragraph.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}</p>`
-              })
-              .join(''),
-          }}
-        />
+        <div className="space-y-6 text-run-gray-900">
+          {story.body.split('\n\n').map((paragraph, index) => {
+            return renderParagraph(paragraph, index)
+          })}
+        </div>
       </article>
 
       {/* Share/Actions */}

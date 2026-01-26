@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 
-// Seed data for preview (until we have real Flow entries from database)
+// Fallback seed data (used when database doesn't have enough entries)
 const SEED_EXPRESSIONS = [
   'Sanity...',
   'The Bacon...',
@@ -29,9 +29,20 @@ const SEED_EXPRESSIONS = [
   'The community that gets it...',
 ]
 
-export function FlowPreview() {
+interface FlowPreviewProps {
+  /** Expression content from the database */
+  expressions?: string[]
+}
+
+export function FlowPreview({ expressions }: FlowPreviewProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [isPaused, setIsPaused] = useState(false)
+
+  // Use database expressions if we have enough, otherwise mix with seed data
+  const displayExpressions =
+    expressions && expressions.length >= 10
+      ? expressions
+      : [...(expressions || []), ...SEED_EXPRESSIONS].slice(0, 20)
 
   useEffect(() => {
     const scrollElement = scrollRef.current
@@ -99,17 +110,19 @@ export function FlowPreview() {
         >
           <div className="inline-flex gap-4 py-8">
             {/* Duplicate the array to create seamless loop effect */}
-            {[...SEED_EXPRESSIONS, ...SEED_EXPRESSIONS].map((expr, index) => (
-              <motion.div
-                key={`${expr}-${index}`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                className="organic-edges inline-block bg-card px-6 py-4 shadow-sm"
-              >
-                <p className="text-sm italic text-muted-foreground">{expr}</p>
-              </motion.div>
-            ))}
+            {[...displayExpressions, ...displayExpressions].map(
+              (expr, index) => (
+                <motion.div
+                  key={`${expr}-${index}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="organic-edges inline-block bg-card px-6 py-4 shadow-sm"
+                >
+                  <p className="text-sm italic text-muted-foreground">{expr}</p>
+                </motion.div>
+              )
+            )}
           </div>
         </div>
 
