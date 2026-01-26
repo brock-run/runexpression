@@ -46,17 +46,17 @@ export async function POST(request: NextRequest) {
       .single()
 
     const expressionData = profile?.expression_data as Record<string, unknown> | null
-    const _isAdmin =
+    const isAdmin =
       expressionData?.is_admin === true || expressionData?.is_moderator === true
 
-    // For development, allow any authenticated user
-    // In production, uncomment this check:
-    // if (!isAdmin) {
-    //   return NextResponse.json(
-    //     { error: 'Admin privileges required.' },
-    //     { status: 403 }
-    //   )
-    // }
+    // Enforce authorization check (bypassed only in development)
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    if (!isAdmin && !isDevelopment) {
+      return NextResponse.json(
+        { error: 'Admin privileges required.' },
+        { status: 403 }
+      )
+    }
 
     // 3. Parse and validate request body
     const body = await request.json()
@@ -77,6 +77,8 @@ export async function POST(request: NextRequest) {
 
     // 4. Update the content status using admin client (bypass RLS)
     const adminClient = createAdminClient()
+    let trustPointsAwarded = false
+    let trustPointsError: string | null = null
 
     if (type === 'flow') {
       const { error: updateError } = await adminClient
@@ -92,10 +94,21 @@ export async function POST(request: NextRequest) {
         throw new Error(`Failed to update Flow post: ${updateError.message}`)
       }
 
-      // Award trust points
+      // Award trust points (non-blocking failure)
       const eventType =
         action === 'approve' ? 'flow_post_approved' : 'flow_post_rejected'
-      await awardTrustPoints(user_id, eventType)
+      try {
+        await awardTrustPoints(user_id, eventType)
+        trustPointsAwarded = true
+      } catch (trustError) {
+        console.error('Failed to award trust points:', trustError)
+        Sentry.captureException(trustError, {
+          tags: { api: 'admin-moderate', operation: 'award-trust-points' },
+          extra: { user_id, eventType, contentType: type, contentId: id },
+        })
+        trustPointsError =
+          trustError instanceof Error ? trustError.message : 'Unknown error'
+      }
     } else {
       // Clubhouse contribution
       const { error: updateError } = await adminClient
@@ -113,18 +126,43 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Award trust points
+      // Award trust points (non-blocking failure)
       const eventType =
         action === 'approve'
           ? 'contribution_approved'
           : 'contribution_rejected'
-      await awardTrustPoints(user_id, eventType)
+      try {
+        await awardTrustPoints(user_id, eventType)
+        trustPointsAwarded = true
+      } catch (trustError) {
+        console.error('Failed to award trust points:', trustError)
+        Sentry.captureException(trustError, {
+          tags: { api: 'admin-moderate', operation: 'award-trust-points' },
+          extra: { user_id, eventType, contentType: type, contentId: id },
+        })
+        trustPointsError =
+          trustError instanceof Error ? trustError.message : 'Unknown error'
+      }
     }
 
-    // 5. Return success
+    // 5. Return success (with partial success indicator if trust points failed)
+    const actionPastTense = action === 'approve' ? 'approved' : 'rejected'
+
+    if (!trustPointsAwarded) {
+      return NextResponse.json(
+        {
+          success: true,
+          message: `Content ${actionPastTense} successfully.`,
+          warning: 'Trust points could not be awarded.',
+          trustPointsError,
+        },
+        { status: 207 } // 207 Multi-Status indicates partial success
+      )
+    }
+
     return NextResponse.json({
       success: true,
-      message: `Content ${action}d successfully.`,
+      message: `Content ${actionPastTense} successfully.`,
     })
   } catch (error) {
     console.error('Moderation error:', error)

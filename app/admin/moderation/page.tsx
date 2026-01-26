@@ -22,14 +22,14 @@ export default async function ModerationPage() {
     .single()
 
   const expressionData = profile?.expression_data as Record<string, unknown> | null
-  const _isAdmin =
+  const isAdmin =
     expressionData?.is_admin === true || expressionData?.is_moderator === true
 
-  // For development, allow any authenticated user
-  // In production, uncomment this check:
-  // if (!isAdmin) {
-  //   redirect('/flow')
-  // }
+  // Enforce authorization check (bypassed only in development)
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  if (!isAdmin && !isDevelopment) {
+    redirect('/flow')
+  }
 
   // Fetch pending Flow posts
   const { data: pendingFlowPosts } = await supabase

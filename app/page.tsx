@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 export default async function HomePage() {
   // Fetch recent approved Flow expressions for the preview
   const supabase = createClient()
-  const { data: flowPosts } = await supabase
+  const { data, error } = await supabase
     .from('expression_events')
     .select('content')
     .eq('moderation_status', 'approved')
@@ -15,10 +15,13 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
     .limit(30)
 
-  // Extract just the content strings
-  const expressions = flowPosts
-    ?.map(post => post.content)
-    .filter((content): content is string => Boolean(content))
+  if (error) {
+    console.error('Failed to fetch Flow expressions for homepage preview:', error)
+  }
+
+  // Extract just the content strings with safe fallback
+  const expressions =
+    data?.map(post => post.content).filter((c): c is string => Boolean(c)) ?? []
 
   return (
     <>

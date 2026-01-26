@@ -122,6 +122,21 @@ export async function getClubContributionCounts(
       .eq('moderation_status', 'approved'),
   ])
 
+  // Check for errors in each result before returning counts
+  if (storiesResult.error) {
+    throw new Error(
+      `Error fetching stories count: ${storiesResult.error.message}`
+    )
+  }
+  if (mediaResult.error) {
+    throw new Error(`Error fetching media count: ${mediaResult.error.message}`)
+  }
+  if (documentsResult.error) {
+    throw new Error(
+      `Error fetching documents count: ${documentsResult.error.message}`
+    )
+  }
+
   return {
     stories: storiesResult.count || 0,
     media: mediaResult.count || 0,
@@ -167,6 +182,9 @@ export async function getClubTags(
   if (type) {
     query = query.eq('type', type)
   }
+
+  // Limit to prevent unbounded queries - 1000 contributions should cover all unique tags
+  query = query.limit(1000)
 
   const { data, error } = await query
 

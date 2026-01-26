@@ -167,3 +167,25 @@ export async function getClubBySlug(
 
   return data
 }
+
+/**
+ * Fetches a single club contribution by its ID.
+ * @param contributionId - The UUID of the contribution
+ * @returns The contribution record or null if not found
+ */
+export async function getContributionById(
+  contributionId: string
+): Promise<ClubContribution | null> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('club_contributions')
+    .select('*')
+    .eq('id', contributionId)
+    .single()
+
+  if (error) {
+    return null
+  }
+
+  return data
+}

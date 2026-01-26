@@ -50,7 +50,7 @@ export default async function ResourcesPage({
 
   // Format file size helper
   const formatFileSize = (bytes: number | null) => {
-    if (!bytes) return 'Unknown size'
+    if (bytes == null) return 'Unknown size'
     if (bytes < 1024) return `${bytes} B`
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
@@ -78,6 +78,7 @@ export default async function ResourcesPage({
     {
       name: 'Training Plans',
       icon: '📋',
+      filterTag: allTags.find(t => t.includes('training') || t.includes('plan')),
       count: resources.filter(
         r => r.tags?.some(t => t.includes('training') || t.includes('plan'))
       ).length,
@@ -85,6 +86,7 @@ export default async function ResourcesPage({
     {
       name: 'Routes & Maps',
       icon: '🗺️',
+      filterTag: allTags.find(t => t.includes('route') || t.includes('map')),
       count: resources.filter(
         r =>
           r.tags?.some(t => t.includes('route') || t.includes('map')) ||
@@ -94,6 +96,7 @@ export default async function ResourcesPage({
     {
       name: 'Race Reports',
       icon: '🏁',
+      filterTag: allTags.find(t => t.includes('race') || t.includes('report')),
       count: resources.filter(r =>
         r.tags?.some(t => t.includes('race') || t.includes('report'))
       ).length,
@@ -101,6 +104,15 @@ export default async function ResourcesPage({
     {
       name: 'Other',
       icon: '📄',
+      filterTag: allTags.find(
+        t =>
+          !t.includes('training') &&
+          !t.includes('plan') &&
+          !t.includes('route') &&
+          !t.includes('map') &&
+          !t.includes('race') &&
+          !t.includes('report')
+      ),
       count: resources.filter(
         r =>
           !r.tags?.some(
@@ -114,7 +126,7 @@ export default async function ResourcesPage({
           )
       ).length,
     },
-  ].filter(c => c.count > 0)
+  ].filter(c => c.count > 0 && c.filterTag)
 
   return (
     <div className="space-y-12">
@@ -151,16 +163,18 @@ export default async function ResourcesPage({
           <h2 className="mb-6 text-2xl font-bold">Browse by Category</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {categories.map(category => (
-              <Card
+              <Link
                 key={category.name}
-                className="cursor-pointer p-6 transition-colors hover:border-orange-600 hover:bg-orange-50"
+                href={`/club/${slug}/resources?tag=${encodeURIComponent(category.filterTag!)}`}
               >
-                <div className="mb-2 text-3xl">{category.icon}</div>
-                <h3 className="mb-1 font-bold">{category.name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {category.count} resource{category.count !== 1 ? 's' : ''}
-                </p>
-              </Card>
+                <Card className="cursor-pointer p-6 transition-colors hover:border-orange-600 hover:bg-orange-50">
+                  <div className="mb-2 text-3xl">{category.icon}</div>
+                  <h3 className="mb-1 font-bold">{category.name}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {category.count} resource{category.count !== 1 ? 's' : ''}
+                  </p>
+                </Card>
+              </Link>
             ))}
           </div>
         </section>

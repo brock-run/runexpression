@@ -47,8 +47,6 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Check if user is admin/moderator
-    // For now, we'll check if they have a specific role or are the service user
-    // In production, you'd check against an admin_users table or similar
     const { data: profile } = await supabase
       .from('profiles')
       .select('expression_data')
@@ -56,19 +54,33 @@ export async function POST(request: NextRequest) {
       .single()
 
     const expressionData = profile?.expression_data as Record<string, unknown> | null
-    const _isAdmin = expressionData?.is_admin === true || expressionData?.is_moderator === true
+    const isAdmin = expressionData?.is_admin === true || expressionData?.is_moderator === true
 
-    // For development, allow any authenticated user to award points
-    // In production, uncomment this check:
-    // if (!isAdmin) {
-    //   return NextResponse.json(
-    //     { error: 'Admin privileges required.' },
-    //     { status: 403 }
-    //   )
-    // }
+    // Enforce authorization check (bypassed only in development)
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    if (!isAdmin && !isDevelopment) {
+      return NextResponse.json(
+        { error: 'Admin privileges required.' },
+        { status: 403 }
+      )
+    }
 
     // 3. Parse and validate request body
-    const body = await request.json()
+    let body
+    try {
+      body = await request.json()
+    } catch (parseError) {
+      // Handle malformed JSON separately from validation errors
+      if (parseError instanceof SyntaxError) {
+        return NextResponse.json(
+          { error: 'Invalid JSON in request body.' },
+          { status: 400 }
+        )
+      }
+      // Re-throw unexpected errors to be caught by outer handler
+      throw parseError
+    }
+
     const validationResult = AwardTrustSchema.safeParse(body)
 
     if (!validationResult.success) {

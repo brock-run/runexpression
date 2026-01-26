@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { TagFilter } from '@/components/clubhouse/tag-filter'
+import { MediaGrid } from '@/components/clubhouse/media-grid'
 import {
   getClubBySlug,
   getClubContributions,
@@ -16,6 +16,8 @@ interface MediaPageProps {
   params: Promise<{ slug: string }>
   searchParams: Promise<{ tag?: string }>
 }
+
+const PAGE_SIZE = 30
 
 export default async function MediaPage({
   params,
@@ -31,20 +33,18 @@ export default async function MediaPage({
   }
 
   // Fetch media, counts, and tags from database
-  const [mediaItems, counts, allTags] = await Promise.all([
-    getClubContributions(club.id, { type: 'media', limit: 30, tag: selectedTag }),
+  const [mediaResults, counts, allTags] = await Promise.all([
+    getClubContributions(club.id, {
+      type: 'media',
+      limit: PAGE_SIZE + 1,
+      tag: selectedTag,
+    }),
     getClubContributionCounts(club.id),
     getClubTags(club.id, 'media'),
   ])
 
-  // Format date helper
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  }
+  const mediaItems = mediaResults.slice(0, PAGE_SIZE)
+  const initialHasMore = mediaResults.length > PAGE_SIZE
 
   return (
     <div className="space-y-12">
@@ -77,58 +77,13 @@ export default async function MediaPage({
 
       {/* Media Grid - Masonry-style */}
       {mediaItems.length > 0 ? (
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {mediaItems.map((item, index) => (
-            <Card
-              key={item.id}
-              className={`group overflow-hidden ${
-                index % 5 === 0 ? 'sm:col-span-2 sm:row-span-2' : ''
-              }`}
-            >
-              <div
-                className={`relative w-full overflow-hidden ${
-                  index % 5 === 0 ? 'aspect-[16/10]' : 'aspect-[4/3]'
-                }`}
-              >
-                {item.media_url ? (
-                  <Image
-                    src={item.media_url}
-                    alt={item.title || 'Club media'}
-                    fill
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition-transform group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-run-gray-100">
-                    <span className="text-muted-foreground">No image</span>
-                  </div>
-                )}
-                {/* Overlay on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-              </div>
-              <div className="p-4">
-                <p className="mb-2 text-sm font-medium leading-tight">
-                  {item.title || item.body}
-                </p>
-                <p className="mb-3 text-xs text-muted-foreground">
-                  {formatDate(item.created_at)}
-                </p>
-                {item.tags && item.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {item.tags.slice(0, 3).map(tag => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-run-gray-100 px-2 py-0.5 text-xs font-medium text-run-gray-700"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Card>
-          ))}
-        </section>
+        <MediaGrid
+          initialItems={mediaItems}
+          initialHasMore={initialHasMore}
+          slug={slug}
+          selectedTag={selectedTag}
+          pageSize={PAGE_SIZE}
+        />
       ) : (
         <Card className="p-8 text-center">
           <p className="mb-4 text-muted-foreground">
@@ -142,10 +97,16 @@ export default async function MediaPage({
         </Card>
       )}
 
-      {/* Load More - would use client component for pagination */}
-      {mediaItems.length >= 30 && (
+      {/* Load More */}
+      {mediaItems.length >= 9 && (
         <div className="text-center">
-          <Button variant="outline" size="lg">
+          <Button
+            variant="outline"
+            size="lg"
+            disabled
+            title="Pagination coming soon"
+            aria-label="Load more photos - Pagination coming soon"
+          >
             Load More Photos
           </Button>
         </div>

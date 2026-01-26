@@ -11,13 +11,14 @@ import {
 } from '@/lib/clubhouse/queries'
 
 interface ClubOverviewPageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export default async function ClubOverviewPage({
   params,
 }: ClubOverviewPageProps) {
-  const club = await getClubBySlug(params.slug)
+  const { slug } = await params
+  const club = await getClubBySlug(slug)
 
   if (!club) {
     notFound()
@@ -58,10 +59,10 @@ export default async function ClubOverviewPage({
             size="lg"
             className="bg-orange-600 text-white hover:bg-orange-700"
           >
-            <Link href={`/club/${params.slug}/upload`}>Share Your Story</Link>
+            <Link href={`/club/${slug}/upload`}>Share Your Story</Link>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <Link href={`/club/${params.slug}/lore`}>Explore the Lore</Link>
+            <Link href={`/club/${slug}/lore`}>Explore the Lore</Link>
           </Button>
         </div>
       </section>
@@ -71,7 +72,7 @@ export default async function ClubOverviewPage({
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold">Recent Stories</h2>
           <Button asChild variant="ghost">
-            <Link href={`/club/${params.slug}/lore`}>View All →</Link>
+            <Link href={`/club/${slug}/lore`}>View All →</Link>
           </Button>
         </div>
         {recentStories.length > 0 ? (
@@ -106,7 +107,7 @@ export default async function ClubOverviewPage({
               No stories yet. Be the first to share!
             </p>
             <Button asChild variant="outline">
-              <Link href={`/club/${params.slug}/upload`}>Add Your Story</Link>
+              <Link href={`/club/${slug}/upload`}>Add Your Story</Link>
             </Button>
           </Card>
         )}
@@ -117,7 +118,7 @@ export default async function ClubOverviewPage({
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold">Recent Media</h2>
           <Button asChild variant="ghost">
-            <Link href={`/club/${params.slug}/media`}>View Gallery →</Link>
+            <Link href={`/club/${slug}/media`}>View Gallery →</Link>
           </Button>
         </div>
         {recentMedia.length > 0 ? (
@@ -156,7 +157,7 @@ export default async function ClubOverviewPage({
               No photos yet. Share your first one!
             </p>
             <Button asChild variant="outline">
-              <Link href={`/club/${params.slug}/upload`}>Upload Photo</Link>
+              <Link href={`/club/${slug}/upload`}>Upload Photo</Link>
             </Button>
           </Card>
         )}

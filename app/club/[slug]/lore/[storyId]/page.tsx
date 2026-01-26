@@ -2,14 +2,132 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { notFound } from 'next/navigation'
-import {
-  getClubBySlug,
-  getContributionById,
-  getClubContributions,
-} from '@/lib/clubhouse/queries'
+import { ReactNode } from 'react'
 
 interface StoryDetailPageProps {
   params: Promise<{ slug: string; storyId: string }>
+}
+
+/**
+ * Safely renders text with markdown-style bold markers (**text**) as React elements.
+ * Escapes all HTML to prevent XSS attacks.
+ */
+function renderTextWithBold(text: string): ReactNode[] {
+  const parts: ReactNode[] = []
+  let currentIndex = 0
+  let keyCounter = 0
+
+  // Escape HTML entities
+  const escapeHtml = (str: string): string => {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+  }
+
+  // Find all **text** patterns
+  const boldPattern = /\*\*([^*]+)\*\*/g
+  let match: RegExpExecArray | null
+
+  while ((match = boldPattern.exec(text)) !== null) {
+    // Add text before the match (escaped)
+    if (match.index > currentIndex) {
+      const textBefore = text.slice(currentIndex, match.index)
+      parts.push(escapeHtml(textBefore))
+    }
+
+    // Add the bold text (escaped)
+    parts.push(
+      <strong key={`bold-${keyCounter++}`}>{escapeHtml(match[1])}</strong>
+    )
+
+    currentIndex = match.index + match[0].length
+  }
+
+  // Add remaining text (escaped)
+  if (currentIndex < text.length) {
+    parts.push(escapeHtml(text.slice(currentIndex)))
+  }
+
+  return parts.length > 0 ? parts : [escapeHtml(text)]
+}
+
+/**
+ * Safely renders a markdown-style paragraph as React elements.
+ * Handles headings, lists, horizontal rules, and paragraphs without using dangerouslySetInnerHTML.
+ */
+function renderParagraph(paragraph: string, index: number): ReactNode {
+  const escapeHtml = (str: string): string => {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+  }
+
+  // H1 heading
+  if (paragraph.startsWith('# ')) {
+    const content = paragraph.slice(2)
+    return (
+      <h1 key={index} className="text-3xl font-bold mb-4">
+        {escapeHtml(content)}
+      </h1>
+    )
+  }
+
+  // H2 heading
+  if (paragraph.startsWith('## ')) {
+    const content = paragraph.slice(3)
+    return (
+      <h2 key={index} className="text-2xl font-bold mb-3 mt-8">
+        {escapeHtml(content)}
+      </h2>
+    )
+  }
+
+  // Unordered list
+  if (paragraph.startsWith('- ')) {
+    const items = paragraph
+      .split('\n')
+      .filter((line) => line.startsWith('- '))
+      .map((line, i) => (
+        <li key={`${index}-${i}`}>{renderTextWithBold(line.slice(2))}</li>
+      ))
+
+    return (
+      <ul key={index} className="list-disc list-inside space-y-2 my-4">
+        {items}
+      </ul>
+    )
+  }
+
+  // Italic centered text (e.g., *text*)
+  if (paragraph.startsWith('*') && paragraph.endsWith('*')) {
+    const content = paragraph.slice(1, -1)
+    return (
+      <p
+        key={index}
+        className="italic text-center text-muted-foreground my-8"
+      >
+        {escapeHtml(content)}
+      </p>
+    )
+  }
+
+  // Horizontal rule
+  if (paragraph.startsWith('---')) {
+    return <hr key={index} className="my-8 border-t border-border" />
+  }
+
+  // Regular paragraph with bold support
+  return (
+    <p key={index} className="leading-relaxed">
+      {renderTextWithBold(paragraph)}
+    </p>
+  )
 }
 
 export default async function StoryDetailPage({
@@ -17,93 +135,79 @@ export default async function StoryDetailPage({
 }: StoryDetailPageProps) {
   const { slug, storyId } = await params
 
-  const club = await getClubBySlug(slug)
-  if (!club) {
+  // Mock data - will be replaced with Supabase query
+  const story = {
+    id: storyId,
+    title: 'The Bacon Ritual: Origins',
+    author: 'Sarah M.',
+    date: '2025-12-10',
+    tags: ['bacon', 'tradition', 'lore', 'founding-story'],
+    body: `# The Bacon Ritual: Origins
+
+It started on a Tuesday morning. The air was thick with humidity and questionable life choices. We'd just finished a brutal time trial—one of those sessions where you question every decision that led you to a track at 5 AM.
+
+## The Discovery
+
+Someone (I won't name names, but you know who you are) pulled out a portable camping stove from their trunk. Then came the bacon. Not pre-cooked. Not microwaved. Real, raw bacon, ready to be cooked in a parking lot while we were still in our race bibs.
+
+The absurdity was immediate. The brilliance took a moment longer.
+
+## Why It Works
+
+There's something profound about cooking bacon in a parking lot after you've just run yourself into the ground. It's the ultimate juxtaposition:
+
+- **Suffering meets celebration**
+- **Performance meets pleasure**
+- **Discipline meets chaos**
+
+We run to push ourselves. We cook bacon because we can. Because we're alive. Because the parking lot is our laboratory, and bacon is our reward for showing up.
+
+## The Tradition Takes Root
+
+That first Tuesday, it was just three of us standing around a camping stove, laughing at ourselves. By the next week, seven people showed up with bacon. Then twelve. Then we had to organize who brings what.
+
+Now it's sacred. Not because bacon is healthy (it's decidedly not). Not because it makes you faster (it doesn't). But because it reminds us that running is about more than times and training plans.
+
+It's about the parking lot conversations. The shared suffering. The collective decision to do something absurd and embrace it fully.
+
+## The Philosophy
+
+The Sage in the Parking Lot says: "Leave heavy. Return light. Then cook bacon."
+
+Running strips away the unnecessary. The bacon ritual reminds us to celebrate the unnecessary. Both are essential.
+
+Every Tuesday, we gather. We run hard. We suffer together. Then we stand around a camping stove in a parking lot and remember why we do this ridiculous thing we call running.
+
+## Your Invitation
+
+If you're new to DWTC, know this: the bacon ritual isn't about the bacon. It's about showing up. It's about community. It's about celebrating the absurdity of paying to wake up at 4 AM to run in circles.
+
+But also, it's definitely about the bacon.
+
+---
+
+*This is DWTC. This is what we do. Welcome to the laboratory.*`,
+  }
+
+  if (!story) {
     notFound()
   }
 
-  const story = await getContributionById(storyId)
-  if (!story || story.type !== 'story') {
-    notFound()
-  }
-
-  // Fetch related stories (same club, different story)
-  const allStories = await getClubContributions(club.id, {
-    type: 'story',
-    limit: 5,
-  })
-  const relatedStories = allStories
-    .filter(s => s.id !== storyId)
-    .slice(0, 2)
-
-  // Format date helper
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
-
-  // Simple markdown-like rendering
-  const renderBody = (body: string | null) => {
-    if (!body) return null
-
-    return body
-      .split('\n\n')
-      .map((paragraph, index) => {
-        if (paragraph.startsWith('# ')) {
-          return (
-            <h1 key={index} className="mb-4 text-3xl font-bold">
-              {paragraph.slice(2)}
-            </h1>
-          )
-        }
-        if (paragraph.startsWith('## ')) {
-          return (
-            <h2 key={index} className="mb-3 mt-8 text-2xl font-bold">
-              {paragraph.slice(3)}
-            </h2>
-          )
-        }
-        if (paragraph.startsWith('- ')) {
-          const items = paragraph
-            .split('\n')
-            .filter(line => line.startsWith('- '))
-            .map((line, i) => <li key={i}>{line.slice(2)}</li>)
-          return (
-            <ul key={index} className="my-4 list-inside list-disc space-y-2">
-              {items}
-            </ul>
-          )
-        }
-        if (paragraph.startsWith('*') && paragraph.endsWith('*')) {
-          return (
-            <p
-              key={index}
-              className="my-8 text-center italic text-muted-foreground"
-            >
-              {paragraph.slice(1, -1)}
-            </p>
-          )
-        }
-        if (paragraph.startsWith('---')) {
-          return <hr key={index} className="my-8 border-t border-border" />
-        }
-        // Handle bold text within paragraphs
-        const formattedText = paragraph.replace(
-          /\*\*([^*]+)\*\*/g,
-          '<strong>$1</strong>'
-        )
-        return (
-          <p
-            key={index}
-            className="leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: formattedText }}
-          />
-        )
-      })
-  }
+  // Related stories
+  const relatedStories = [
+    {
+      id: '2',
+      title: 'Breaking into the Sub-16 Club',
+      excerpt: "The 5K time trial that changed everything...",
+      tags: ['sub-16', 'time-trial'],
+    },
+    {
+      id: '3',
+      title: 'Why We Run at 4 AM',
+      excerpt: 'The absurdity of pre-dawn miles...',
+      tags: ['philosophy', 'dawn-patrol'],
+    },
+  ]
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
@@ -116,25 +220,29 @@ export default async function StoryDetailPage({
       <div className="border-b border-border pb-8">
         <h1 className="mb-4 text-4xl font-bold md:text-5xl">{story.title}</h1>
         <div className="mb-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-          <span>{formatDate(story.created_at)}</span>
+          <span>By {story.author}</span>
+          <span>•</span>
+          <span>{story.date}</span>
         </div>
-        {story.tags && story.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {story.tags.map(tag => (
-              <span
-                key={tag}
-                className="rounded-full bg-run-gray-100 px-3 py-1.5 text-sm font-medium text-run-gray-700"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {story.tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full bg-run-gray-100 px-3 py-1.5 text-sm font-medium text-run-gray-700"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* Story Body */}
       <article className="prose prose-lg max-w-none">
-        <div className="space-y-6 text-run-gray-900">{renderBody(story.body)}</div>
+        <div className="space-y-6 text-run-gray-900">
+          {story.body.split('\n\n').map((paragraph, index) => {
+            return renderParagraph(paragraph, index)
+          })}
+        </div>
       </article>
 
       {/* Share/Actions */}
@@ -156,42 +264,36 @@ export default async function StoryDetailPage({
       </Card>
 
       {/* Related Stories */}
-      {relatedStories.length > 0 && (
-        <section>
-          <h2 className="mb-6 text-2xl font-bold">Related Stories</h2>
-          <div className="grid gap-6 md:grid-cols-2">
-            {relatedStories.map(related => (
-              <Card key={related.id} className="p-6">
-                <h3 className="mb-3 text-xl font-bold">
-                  <Link
-                    href={`/club/${slug}/lore/${related.id}`}
-                    className="hover:text-orange-600"
+      <section>
+        <h2 className="mb-6 text-2xl font-bold">Related Stories</h2>
+        <div className="grid gap-6 md:grid-cols-2">
+          {relatedStories.map((related) => (
+            <Card key={related.id} className="p-6">
+              <h3 className="mb-3 text-xl font-bold">
+                <Link
+                  href={`/club/${slug}/lore/${related.id}`}
+                  className="hover:text-orange-600"
+                >
+                  {related.title}
+                </Link>
+              </h3>
+              <p className="mb-4 text-sm text-run-gray-700">
+                {related.excerpt}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {related.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-run-gray-100 px-2 py-1 text-xs font-medium text-run-gray-700"
                   >
-                    {related.title}
-                  </Link>
-                </h3>
-                {related.body && (
-                  <p className="mb-4 line-clamp-2 text-sm text-run-gray-700">
-                    {related.body}
-                  </p>
-                )}
-                {related.tags && related.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {related.tags.slice(0, 3).map(tag => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-run-gray-100 px-2 py-1 text-xs font-medium text-run-gray-700"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
     </div>
   )
 }

@@ -3,10 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import * as Sentry from '@sentry/nextjs'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CheckCircle, XCircle, Loader2, ImageIcon, FileText } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 interface FlowPost {
   id: string
@@ -53,6 +55,7 @@ export function ModerationQueue({
   contributions,
 }: ModerationQueueProps) {
   const router = useRouter()
+  const { toast } = useToast()
   const [processingId, setProcessingId] = useState<string | null>(null)
 
   const handleModerate = async (
@@ -86,7 +89,22 @@ export function ModerationQueue({
       router.refresh()
     } catch (error) {
       console.error('Moderation error:', error)
-      alert(error instanceof Error ? error.message : 'Failed to moderate content')
+      Sentry.captureException(error, {
+        tags: {
+          feature: 'moderation',
+          action,
+          type,
+        },
+        extra: {
+          contentId: id,
+          userId,
+        },
+      })
+      toast({
+        title: 'Could not complete moderation',
+        description: 'Please try again. If the problem persists, contact support.',
+        variant: 'destructive',
+      })
     } finally {
       setProcessingId(null)
     }
