@@ -1,24 +1,40 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { getClubBySlug, getClubContributions } from '@/lib/clubhouse/queries'
+import { TagFilter } from '@/components/clubhouse/tag-filter'
+import {
+  getClubBySlug,
+  getClubContributions,
+  getClubTags,
+} from '@/lib/clubhouse/queries'
 
 interface LorePageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ tag?: string }>
 }
 
-export default async function LorePage({ params }: LorePageProps) {
-  const club = await getClubBySlug(params.slug)
+export default async function LorePage({ params, searchParams }: LorePageProps) {
+  const { slug } = await params
+  const { tag: selectedTag } = await searchParams
+
+  const club = await getClubBySlug(slug)
 
   if (!club) {
     notFound()
   }
 
-  // Fetch stories from database
-  const [featuredStories, allStories] = await Promise.all([
-    getClubContributions(club.id, { type: 'story', featured: true, limit: 4 }),
-    getClubContributions(club.id, { type: 'story', limit: 50 }),
+  // Fetch stories and tags from database
+  const [featuredStories, allStories, allTags] = await Promise.all([
+    getClubContributions(club.id, {
+      type: 'story',
+      featured: true,
+      limit: 4,
+      tag: selectedTag,
+    }),
+    getClubContributions(club.id, { type: 'story', limit: 50, tag: selectedTag }),
+    getClubTags(club.id, 'story'),
   ])
 
   // Filter out featured stories from all stories to avoid duplicates
@@ -33,13 +49,6 @@ export default async function LorePage({ params }: LorePageProps) {
       day: 'numeric',
     })
   }
-
-  // Collect all unique tags for the filter section
-  const allTags = new Set<string>()
-  allStories.forEach(story => {
-    story.tags?.forEach(tag => allTags.add(tag))
-  })
-  const uniqueTags = Array.from(allTags).slice(0, 12)
 
   return (
     <div className="space-y-12">
@@ -56,9 +65,19 @@ export default async function LorePage({ params }: LorePageProps) {
           size="lg"
           className="bg-orange-600 text-white hover:bg-orange-700"
         >
-          <Link href={`/club/${params.slug}/upload`}>Add Your Story</Link>
+          <Link href={`/club/${slug}/upload`}>Add Your Story</Link>
         </Button>
       </div>
+
+      {/* Tag Filter */}
+      {allTags.length > 0 && (
+        <section className="rounded-lg border border-border bg-run-gray-50 p-6">
+          <h3 className="mb-4 text-lg font-bold">Filter by Theme</h3>
+          <Suspense fallback={<div className="h-10" />}>
+            <TagFilter tags={allTags} selectedTag={selectedTag} />
+          </Suspense>
+        </section>
+      )}
 
       {/* Featured Stories */}
       {featuredStories.length > 0 && (
@@ -93,7 +112,7 @@ export default async function LorePage({ params }: LorePageProps) {
                     </div>
                   )}
                   <Button asChild variant="outline">
-                    <Link href={`/club/${params.slug}/lore/${story.id}`}>
+                    <Link href={`/club/${slug}/lore/${story.id}`}>
                       Read Full Story →
                     </Link>
                   </Button>
@@ -106,7 +125,9 @@ export default async function LorePage({ params }: LorePageProps) {
 
       {/* All Stories */}
       <section>
-        <h2 className="mb-6 text-2xl font-bold">All Stories</h2>
+        <h2 className="mb-6 text-2xl font-bold">
+          {selectedTag ? `Stories tagged #${selectedTag}` : 'All Stories'}
+        </h2>
         {regularStories.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {regularStories.map(story => (
@@ -131,7 +152,7 @@ export default async function LorePage({ params }: LorePageProps) {
                   </div>
                 )}
                 <Button asChild variant="ghost" size="sm" className="self-start">
-                  <Link href={`/club/${params.slug}/lore/${story.id}`}>
+                  <Link href={`/club/${slug}/lore/${story.id}`}>
                     Read More →
                   </Link>
                 </Button>
@@ -141,31 +162,16 @@ export default async function LorePage({ params }: LorePageProps) {
         ) : featuredStories.length === 0 ? (
           <Card className="p-8 text-center">
             <p className="mb-4 text-muted-foreground">
-              No stories yet. Be the first to share your lore!
+              {selectedTag
+                ? `No stories found with tag #${selectedTag}.`
+                : 'No stories yet. Be the first to share your lore!'}
             </p>
             <Button asChild variant="outline">
-              <Link href={`/club/${params.slug}/upload`}>Add Your Story</Link>
+              <Link href={`/club/${slug}/upload`}>Add Your Story</Link>
             </Button>
           </Card>
         ) : null}
       </section>
-
-      {/* Tags Filter */}
-      {uniqueTags.length > 0 && (
-        <section className="rounded-lg border border-border bg-run-gray-50 p-8">
-          <h3 className="mb-4 text-lg font-bold">Explore by Theme</h3>
-          <div className="flex flex-wrap gap-2">
-            {uniqueTags.map(tag => (
-              <button
-                key={tag}
-                className="rounded-full border border-run-gray-300 bg-white px-4 py-2 text-sm font-medium text-run-gray-700 transition-colors hover:border-orange-600 hover:bg-orange-50 hover:text-orange-600"
-              >
-                #{tag}
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   )
 }

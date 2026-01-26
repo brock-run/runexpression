@@ -31,12 +31,13 @@ export async function getClubContributions(
   options: {
     type?: 'story' | 'media' | 'document'
     featured?: boolean
+    tag?: string
     limit?: number
     offset?: number
   } = {}
 ): Promise<ClubContribution[]> {
   const supabase = createClient()
-  const { type, featured, limit = 20, offset = 0 } = options
+  const { type, featured, tag, limit = 20, offset = 0 } = options
 
   let query = supabase
     .from('club_contributions')
@@ -53,6 +54,11 @@ export async function getClubContributions(
 
   if (featured !== undefined) {
     query = query.eq('is_featured', featured)
+  }
+
+  // Filter by tag using Postgres array contains operator
+  if (tag) {
+    query = query.contains('tags', [tag])
   }
 
   const { data, error } = await query
@@ -140,4 +146,42 @@ export async function getClubMemberCount(clubId: string): Promise<number> {
   }
 
   return count || 0
+}
+
+/**
+ * Get all unique tags used in a club's contributions
+ */
+export async function getClubTags(
+  clubId: string,
+  type?: 'story' | 'media' | 'document'
+): Promise<string[]> {
+  const supabase = createClient()
+
+  let query = supabase
+    .from('club_contributions')
+    .select('tags')
+    .eq('club_id', clubId)
+    .eq('moderation_status', 'approved')
+    .not('tags', 'is', null)
+
+  if (type) {
+    query = query.eq('type', type)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error('Error fetching tags:', error)
+    return []
+  }
+
+  // Flatten and dedupe all tags
+  const allTags = new Set<string>()
+  data?.forEach(row => {
+    if (row.tags && Array.isArray(row.tags)) {
+      row.tags.forEach(tag => allTags.add(tag as string))
+    }
+  })
+
+  return Array.from(allTags).sort()
 }

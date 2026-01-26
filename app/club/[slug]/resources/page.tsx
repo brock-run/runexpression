@@ -1,26 +1,43 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { getClubBySlug, getClubContributions } from '@/lib/clubhouse/queries'
+import { TagFilter } from '@/components/clubhouse/tag-filter'
+import {
+  getClubBySlug,
+  getClubContributions,
+  getClubTags,
+} from '@/lib/clubhouse/queries'
 import { FileText, Map, Download } from 'lucide-react'
 
 interface ResourcesPageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ tag?: string }>
 }
 
-export default async function ResourcesPage({ params }: ResourcesPageProps) {
-  const club = await getClubBySlug(params.slug)
+export default async function ResourcesPage({
+  params,
+  searchParams,
+}: ResourcesPageProps) {
+  const { slug } = await params
+  const { tag: selectedTag } = await searchParams
+
+  const club = await getClubBySlug(slug)
 
   if (!club) {
     notFound()
   }
 
-  // Fetch documents from database
-  const resources = await getClubContributions(club.id, {
-    type: 'document',
-    limit: 50,
-  })
+  // Fetch documents and tags from database
+  const [resources, allTags] = await Promise.all([
+    getClubContributions(club.id, {
+      type: 'document',
+      limit: 50,
+      tag: selectedTag,
+    }),
+    getClubTags(club.id, 'document'),
+  ])
 
   // Format date helper
   const formatDate = (dateString: string) => {
@@ -55,12 +72,6 @@ export default async function ResourcesPage({ params }: ResourcesPageProps) {
     if (fileType.includes('doc')) return 'DOC'
     return fileType.toUpperCase().slice(0, 4)
   }
-
-  // Collect all unique tags for categorization
-  const allTags = new Set<string>()
-  resources.forEach(resource => {
-    resource.tags?.forEach(tag => allTags.add(tag))
-  })
 
   // Derive categories from tags
   const categories = [
@@ -120,12 +131,22 @@ export default async function ResourcesPage({ params }: ResourcesPageProps) {
           size="lg"
           className="bg-orange-600 text-white hover:bg-orange-700"
         >
-          <Link href={`/club/${params.slug}/upload`}>Upload Resource</Link>
+          <Link href={`/club/${slug}/upload`}>Upload Resource</Link>
         </Button>
       </div>
 
+      {/* Tag Filter */}
+      {allTags.length > 0 && (
+        <section className="rounded-lg border border-border bg-run-gray-50 p-6">
+          <h3 className="mb-4 text-lg font-bold">Filter by Tag</h3>
+          <Suspense fallback={<div className="h-10" />}>
+            <TagFilter tags={allTags} selectedTag={selectedTag} />
+          </Suspense>
+        </section>
+      )}
+
       {/* Categories */}
-      {categories.length > 0 && (
+      {!selectedTag && categories.length > 0 && (
         <section>
           <h2 className="mb-6 text-2xl font-bold">Browse by Category</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -147,7 +168,9 @@ export default async function ResourcesPage({ params }: ResourcesPageProps) {
 
       {/* All Resources */}
       <section>
-        <h2 className="mb-6 text-2xl font-bold">All Resources</h2>
+        <h2 className="mb-6 text-2xl font-bold">
+          {selectedTag ? `Resources tagged #${selectedTag}` : 'All Resources'}
+        </h2>
         {resources.length > 0 ? (
           <div className="space-y-4">
             {resources.map(resource => (
@@ -208,10 +231,12 @@ export default async function ResourcesPage({ params }: ResourcesPageProps) {
         ) : (
           <Card className="p-8 text-center">
             <p className="mb-4 text-muted-foreground">
-              No resources yet. Be the first to share!
+              {selectedTag
+                ? `No resources found with tag #${selectedTag}.`
+                : 'No resources yet. Be the first to share!'}
             </p>
             <Button asChild variant="outline">
-              <Link href={`/club/${params.slug}/upload`}>Upload Resource</Link>
+              <Link href={`/club/${slug}/upload`}>Upload Resource</Link>
             </Button>
           </Card>
         )}
@@ -230,7 +255,7 @@ export default async function ResourcesPage({ params }: ResourcesPageProps) {
           size="lg"
           className="bg-orange-600 text-white hover:bg-orange-700"
         >
-          <Link href={`/club/${params.slug}/upload`}>Upload Your Resource</Link>
+          <Link href={`/club/${slug}/upload`}>Upload Your Resource</Link>
         </Button>
       </section>
     </div>

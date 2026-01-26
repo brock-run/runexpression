@@ -1,29 +1,40 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { TagFilter } from '@/components/clubhouse/tag-filter'
 import {
   getClubBySlug,
   getClubContributions,
   getClubContributionCounts,
+  getClubTags,
 } from '@/lib/clubhouse/queries'
 
 interface MediaPageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ tag?: string }>
 }
 
-export default async function MediaPage({ params }: MediaPageProps) {
-  const club = await getClubBySlug(params.slug)
+export default async function MediaPage({
+  params,
+  searchParams,
+}: MediaPageProps) {
+  const { slug } = await params
+  const { tag: selectedTag } = await searchParams
+
+  const club = await getClubBySlug(slug)
 
   if (!club) {
     notFound()
   }
 
-  // Fetch media from database
-  const [mediaItems, counts] = await Promise.all([
-    getClubContributions(club.id, { type: 'media', limit: 30 }),
+  // Fetch media, counts, and tags from database
+  const [mediaItems, counts, allTags] = await Promise.all([
+    getClubContributions(club.id, { type: 'media', limit: 30, tag: selectedTag }),
     getClubContributionCounts(club.id),
+    getClubTags(club.id, 'media'),
   ])
 
   // Format date helper
@@ -34,13 +45,6 @@ export default async function MediaPage({ params }: MediaPageProps) {
       day: 'numeric',
     })
   }
-
-  // Collect all unique tags for the filter section
-  const allTags = new Set<string>()
-  mediaItems.forEach(item => {
-    item.tags?.forEach(tag => allTags.add(tag))
-  })
-  const uniqueTags = Array.from(allTags).slice(0, 8)
 
   return (
     <div className="space-y-12">
@@ -57,27 +61,17 @@ export default async function MediaPage({ params }: MediaPageProps) {
           size="lg"
           className="bg-orange-600 text-white hover:bg-orange-700"
         >
-          <Link href={`/club/${params.slug}/upload`}>Upload Photo/Video</Link>
+          <Link href={`/club/${slug}/upload`}>Upload Photo/Video</Link>
         </Button>
       </div>
 
       {/* Filter Bar */}
-      {uniqueTags.length > 0 && (
+      {allTags.length > 0 && (
         <section className="flex flex-wrap items-center gap-4 rounded-lg border border-border bg-run-gray-50 p-4">
           <span className="text-sm font-medium text-run-gray-700">Filter:</span>
-          <div className="flex flex-wrap gap-2">
-            <button className="rounded-full bg-orange-600 px-4 py-1.5 text-sm font-medium text-white">
-              All
-            </button>
-            {uniqueTags.map(tag => (
-              <button
-                key={tag}
-                className="rounded-full bg-white px-4 py-1.5 text-sm font-medium text-run-gray-700 hover:bg-orange-50 hover:text-orange-600"
-              >
-                #{tag}
-              </button>
-            ))}
-          </div>
+          <Suspense fallback={<div className="h-8" />}>
+            <TagFilter tags={allTags} selectedTag={selectedTag} />
+          </Suspense>
         </section>
       )}
 
@@ -138,10 +132,12 @@ export default async function MediaPage({ params }: MediaPageProps) {
       ) : (
         <Card className="p-8 text-center">
           <p className="mb-4 text-muted-foreground">
-            No photos yet. Be the first to share!
+            {selectedTag
+              ? `No photos found with tag #${selectedTag}.`
+              : 'No photos yet. Be the first to share!'}
           </p>
           <Button asChild variant="outline">
-            <Link href={`/club/${params.slug}/upload`}>Upload Photo</Link>
+            <Link href={`/club/${slug}/upload`}>Upload Photo</Link>
           </Button>
         </Card>
       )}
@@ -167,7 +163,7 @@ export default async function MediaPage({ params }: MediaPageProps) {
         </div>
         <div className="text-center">
           <div className="mb-2 text-3xl font-bold text-orange-600">
-            {uniqueTags.length}
+            {allTags.length}
           </div>
           <div className="text-sm font-medium text-muted-foreground">
             Photo Tags

@@ -438,6 +438,8 @@ export type Database = {
           full_name: string | null
           id: string
           is_active: boolean
+          trust_score: number
+          trust_level: 'newcomer' | 'regular' | 'trusted' | 'pillar'
           updated_at: string
         }
         Insert: {
@@ -448,6 +450,8 @@ export type Database = {
           full_name?: string | null
           id: string
           is_active?: boolean
+          trust_score?: number
+          trust_level?: 'newcomer' | 'regular' | 'trusted' | 'pillar'
           updated_at?: string
         }
         Update: {
@@ -458,9 +462,49 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_active?: boolean
+          trust_score?: number
+          trust_level?: 'newcomer' | 'regular' | 'trusted' | 'pillar'
           updated_at?: string
         }
         Relationships: []
+      }
+      trust_score_events: {
+        Row: {
+          id: string
+          user_id: string
+          event_type: 'flow_post_approved' | 'flow_post_rejected' | 'contribution_approved' | 'contribution_rejected' | 'received_like' | 'membership_verified' | 'daily_login' | 'moderation_action'
+          points: number
+          description: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          event_type: 'flow_post_approved' | 'flow_post_rejected' | 'contribution_approved' | 'contribution_rejected' | 'received_like' | 'membership_verified' | 'daily_login' | 'moderation_action'
+          points: number
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          event_type?: 'flow_post_approved' | 'flow_post_rejected' | 'contribution_approved' | 'contribution_rejected' | 'received_like' | 'membership_verified' | 'daily_login' | 'moderation_action'
+          points?: number
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trust_score_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
