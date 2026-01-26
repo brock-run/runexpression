@@ -25,10 +25,20 @@ export default async function ModerationPage() {
   const isAdmin =
     expressionData?.is_admin === true || expressionData?.is_moderator === true
 
-  // Enforce authorization check (bypassed only in development)
-  const isDevelopment = process.env.NODE_ENV === 'development'
-  if (!isAdmin && !isDevelopment) {
-    redirect('/flow')
+  // Enforce authorization check
+  // SECURITY: Only bypass with explicit ALLOW_ADMIN_BYPASS flag (for local dev/testing only)
+  const allowAdminBypass = process.env.ALLOW_ADMIN_BYPASS === 'true'
+  
+  if (!isAdmin) {
+    if (allowAdminBypass) {
+      console.warn(
+        '⚠️  SECURITY WARNING: Admin authorization bypassed via ALLOW_ADMIN_BYPASS flag.',
+        `User ${user.id} accessing moderation page without admin privileges.`,
+        'This should NEVER be enabled in production.'
+      )
+    } else {
+      redirect('/flow')
+    }
   }
 
   // Fetch pending Flow posts

@@ -56,9 +56,15 @@ export async function POST(request: NextRequest) {
     const expressionData = profile?.expression_data as Record<string, unknown> | null
     const isAdmin = expressionData?.is_admin === true || expressionData?.is_moderator === true
 
-    // Enforce authorization check (bypassed only in development)
-    const isDevelopment = process.env.NODE_ENV === 'development'
-    if (!isAdmin && !isDevelopment) {
+    /**
+     * Enforce authorization check - admin/moderator privileges required.
+     * 
+     * SECURITY: This check is always enforced, even in development.
+     * For testing, use a test admin account with is_admin or is_moderator set to true
+     * in the profiles.expression_data JSONB field, or implement a feature flag system
+     * if you need more granular control over admin bypass behavior.
+     */
+    if (!isAdmin) {
       return NextResponse.json(
         { error: 'Admin privileges required.' },
         { status: 403 }

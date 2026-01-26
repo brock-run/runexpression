@@ -17,41 +17,31 @@ function renderTextWithBold(text: string): ReactNode[] {
   let currentIndex = 0
   let keyCounter = 0
 
-  // Escape HTML entities
-  const escapeHtml = (str: string): string => {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;')
-  }
-
   // Find all **text** patterns
   const boldPattern = /\*\*([^*]+)\*\*/g
   let match: RegExpExecArray | null
 
   while ((match = boldPattern.exec(text)) !== null) {
-    // Add text before the match (escaped)
+    // Add text before the match
     if (match.index > currentIndex) {
       const textBefore = text.slice(currentIndex, match.index)
-      parts.push(escapeHtml(textBefore))
+      parts.push(textBefore)
     }
 
-    // Add the bold text (escaped)
+    // Add the bold text
     parts.push(
-      <strong key={`bold-${keyCounter++}`}>{escapeHtml(match[1])}</strong>
+      <strong key={`bold-${keyCounter++}`}>{match[1]}</strong>
     )
 
     currentIndex = match.index + match[0].length
   }
 
-  // Add remaining text (escaped)
+  // Add remaining text
   if (currentIndex < text.length) {
-    parts.push(escapeHtml(text.slice(currentIndex)))
+    parts.push(text.slice(currentIndex))
   }
 
-  return parts.length > 0 ? parts : [escapeHtml(text)]
+  return parts.length > 0 ? parts : [text]
 }
 
 /**
@@ -104,8 +94,13 @@ function renderParagraph(paragraph: string, index: number): ReactNode {
     )
   }
 
-  // Italic centered text (e.g., *text*)
-  if (paragraph.startsWith('*') && paragraph.endsWith('*')) {
+  // Italic centered text (e.g., *text*) - exclude bold markers (**text**)
+  if (
+    paragraph.startsWith('*') &&
+    paragraph.endsWith('*') &&
+    !paragraph.startsWith('**') &&
+    !paragraph.endsWith('**')
+  ) {
     const content = paragraph.slice(1, -1)
     return (
       <p

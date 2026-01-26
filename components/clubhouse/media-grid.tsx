@@ -34,12 +34,14 @@ export function MediaGrid({
   const [hasMore, setHasMore] = useState(initialHasMore)
   const [offset, setOffset] = useState(initialItems.length)
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
     setItems(initialItems)
     setHasMore(initialHasMore)
     setOffset(initialItems.length)
     setIsLoading(false)
+    setErrorMessage(null)
   }, [initialItems, initialHasMore])
 
   const formatDate = useCallback((dateString: string) => {
@@ -70,6 +72,7 @@ export function MediaGrid({
     }
 
     setIsLoading(true)
+    setErrorMessage(null)
 
     try {
       const payload = await Sentry.startSpan(
@@ -103,6 +106,7 @@ export function MediaGrid({
     } catch (error) {
       console.error('Media pagination error:', error)
       Sentry.captureException(error)
+      setErrorMessage('Oops, we couldn't load more photos. Try again?')
     } finally {
       setIsLoading(false)
     }
@@ -167,6 +171,11 @@ export function MediaGrid({
           <Button variant="outline" size="lg" onClick={() => void loadMore()} disabled={isLoading}>
             Load More Photos
           </Button>
+          {errorMessage && (
+            <p className="mt-3 text-sm text-red-600" role="alert">
+              {errorMessage}
+            </p>
+          )}
         </div>
       )}
     </>
