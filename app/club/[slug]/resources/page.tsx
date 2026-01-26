@@ -1,90 +1,109 @@
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import { getClubBySlug, getClubContributions } from '@/lib/clubhouse/queries'
+import { FileText, Map, Download } from 'lucide-react'
 
-export default async function ResourcesPage() {
-  // Mock data - will be replaced with Supabase queries
-  const resources = [
-    {
-      id: '1',
-      title: 'DWTC Training Plan - 5K Speed',
-      description:
-        'Our signature 8-week training plan for breaking into the Sub-16 club. Includes track workouts, tempo runs, and the all-important bacon ritual recovery protocol.',
-      type: 'PDF',
-      size: '2.4 MB',
-      author: 'Coach Sarah M.',
-      date: '2025-12-10',
-      downloadUrl: '#',
-      tags: ['training-plan', 'sub-16', '5k'],
-    },
-    {
-      id: '2',
-      title: 'Al Qudra Long Run Route',
-      description:
-        'The official DWTC Al Qudra route (22km). Includes water stop locations, sunrise viewing points, and emergency bailout options.',
-      type: 'GPX',
-      size: '124 KB',
-      author: 'Alex K.',
-      date: '2025-12-08',
-      downloadUrl: '#',
-      tags: ['route', 'al-qudra', 'long-run'],
-    },
-    {
-      id: '3',
-      title: 'Time Trial Championship Rules',
-      description:
-        'Official rules for Tuesday morning time trials. Read this before your first championship attempt. Includes pacing strategies and post-race etiquette.',
-      type: 'PDF',
-      size: '890 KB',
-      author: 'Mike R.',
-      date: '2025-12-05',
-      downloadUrl: '#',
-      tags: ['time-trial', 'rules', 'competition'],
-    },
-    {
-      id: '4',
-      title: 'Track Workout Library',
-      description:
-        'Collection of 20+ track workouts tested and approved by DWTC. From VO2 max sessions to threshold builders. Suffer smarter, not just harder.',
-      type: 'PDF',
-      size: '3.2 MB',
-      author: 'Jordan P.',
-      date: '2025-11-28',
-      downloadUrl: '#',
-      tags: ['track', 'workouts', 'training'],
-    },
-    {
-      id: '5',
-      title: 'Dubai Track Locations Map',
-      description:
-        'Comprehensive guide to all runnable tracks in Dubai. Includes surface type, lighting, and ideal training times.',
-      type: 'PDF',
-      size: '1.8 MB',
-      author: 'Casey L.',
-      date: '2025-11-25',
-      downloadUrl: '#',
-      tags: ['track', 'locations', 'dubai'],
-    },
-    {
-      id: '6',
-      title: 'Bacon Ritual Cookbook',
-      description:
-        'Yes, this is real. Our complete guide to post-workout bacon preparation. Includes parking lot cooking tips and the philosophy behind the ritual.',
-      type: 'PDF',
-      size: '4.1 MB',
-      author: 'The Collective',
-      date: '2025-11-20',
-      downloadUrl: '#',
-      tags: ['bacon', 'tradition', 'recovery'],
-    },
-  ]
+interface ResourcesPageProps {
+  params: { slug: string }
+}
 
+export default async function ResourcesPage({ params }: ResourcesPageProps) {
+  const club = await getClubBySlug(params.slug)
+
+  if (!club) {
+    notFound()
+  }
+
+  // Fetch documents from database
+  const resources = await getClubContributions(club.id, {
+    type: 'document',
+    limit: 50,
+  })
+
+  // Format date helper
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  }
+
+  // Format file size helper
+  const formatFileSize = (bytes: number | null) => {
+    if (!bytes) return 'Unknown size'
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  }
+
+  // Get file type icon
+  const getFileIcon = (fileType: string | null) => {
+    if (fileType?.includes('gpx') || fileType?.includes('map')) {
+      return <Map className="h-5 w-5" />
+    }
+    return <FileText className="h-5 w-5" />
+  }
+
+  // Get file type label
+  const getFileTypeLabel = (fileType: string | null) => {
+    if (!fileType) return 'FILE'
+    if (fileType.includes('pdf')) return 'PDF'
+    if (fileType.includes('gpx')) return 'GPX'
+    if (fileType.includes('doc')) return 'DOC'
+    return fileType.toUpperCase().slice(0, 4)
+  }
+
+  // Collect all unique tags for categorization
+  const allTags = new Set<string>()
+  resources.forEach(resource => {
+    resource.tags?.forEach(tag => allTags.add(tag))
+  })
+
+  // Derive categories from tags
   const categories = [
-    { name: 'Training Plans', count: 4, icon: '📋' },
-    { name: 'Routes & Maps', count: 8, icon: '🗺️' },
-    { name: 'Race Reports', count: 12, icon: '🏁' },
-    { name: 'Nutrition', count: 6, icon: '🥓' },
-  ]
+    {
+      name: 'Training Plans',
+      icon: '📋',
+      count: resources.filter(
+        r => r.tags?.some(t => t.includes('training') || t.includes('plan'))
+      ).length,
+    },
+    {
+      name: 'Routes & Maps',
+      icon: '🗺️',
+      count: resources.filter(
+        r =>
+          r.tags?.some(t => t.includes('route') || t.includes('map')) ||
+          r.file_type?.includes('gpx')
+      ).length,
+    },
+    {
+      name: 'Race Reports',
+      icon: '🏁',
+      count: resources.filter(r =>
+        r.tags?.some(t => t.includes('race') || t.includes('report'))
+      ).length,
+    },
+    {
+      name: 'Other',
+      icon: '📄',
+      count: resources.filter(
+        r =>
+          !r.tags?.some(
+            t =>
+              t.includes('training') ||
+              t.includes('plan') ||
+              t.includes('route') ||
+              t.includes('map') ||
+              t.includes('race') ||
+              t.includes('report')
+          )
+      ).length,
+    },
+  ].filter(c => c.count > 0)
 
   return (
     <div className="space-y-12">
@@ -101,70 +120,101 @@ export default async function ResourcesPage() {
           size="lg"
           className="bg-orange-600 text-white hover:bg-orange-700"
         >
-          <Link href="/club/dwtc/upload">Upload Resource</Link>
+          <Link href={`/club/${params.slug}/upload`}>Upload Resource</Link>
         </Button>
       </div>
 
       {/* Categories */}
-      <section>
-        <h2 className="mb-6 text-2xl font-bold">Browse by Category</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map(category => (
-            <Card
-              key={category.name}
-              className="cursor-pointer p-6 transition-colors hover:border-orange-600 hover:bg-orange-50"
-            >
-              <div className="mb-2 text-3xl">{category.icon}</div>
-              <h3 className="mb-1 font-bold">{category.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                {category.count} resources
-              </p>
-            </Card>
-          ))}
-        </div>
-      </section>
+      {categories.length > 0 && (
+        <section>
+          <h2 className="mb-6 text-2xl font-bold">Browse by Category</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {categories.map(category => (
+              <Card
+                key={category.name}
+                className="cursor-pointer p-6 transition-colors hover:border-orange-600 hover:bg-orange-50"
+              >
+                <div className="mb-2 text-3xl">{category.icon}</div>
+                <h3 className="mb-1 font-bold">{category.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {category.count} resource{category.count !== 1 ? 's' : ''}
+                </p>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* All Resources */}
       <section>
         <h2 className="mb-6 text-2xl font-bold">All Resources</h2>
-        <div className="space-y-4">
-          {resources.map(resource => (
-            <Card key={resource.id} className="p-6">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex-grow">
-                  <div className="mb-2 flex items-center gap-3">
-                    <h3 className="text-xl font-bold">{resource.title}</h3>
-                    <span className="rounded bg-run-gray-100 px-2 py-1 text-xs font-medium text-run-gray-700">
-                      {resource.type}
-                    </span>
-                  </div>
-                  <p className="mb-3 text-sm text-muted-foreground">
-                    By {resource.author} • {resource.date} • {resource.size}
-                  </p>
-                  <p className="mb-4 text-run-gray-700">
-                    {resource.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {resource.tags.map(tag => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-run-gray-100 px-3 py-1 text-xs font-medium text-run-gray-700"
-                      >
-                        #{tag}
+        {resources.length > 0 ? (
+          <div className="space-y-4">
+            {resources.map(resource => (
+              <Card key={resource.id} className="p-6">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex-grow">
+                    <div className="mb-2 flex items-center gap-3">
+                      <h3 className="text-xl font-bold">{resource.title}</h3>
+                      <span className="flex items-center gap-1 rounded bg-run-gray-100 px-2 py-1 text-xs font-medium text-run-gray-700">
+                        {getFileIcon(resource.file_type)}
+                        {getFileTypeLabel(resource.file_type)}
                       </span>
-                    ))}
+                    </div>
+                    <p className="mb-3 text-sm text-muted-foreground">
+                      {formatDate(resource.created_at)} •{' '}
+                      {formatFileSize(resource.file_size)}
+                    </p>
+                    {resource.body && (
+                      <p className="mb-4 text-run-gray-700 line-clamp-2">
+                        {resource.body}
+                      </p>
+                    )}
+                    {resource.tags && resource.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {resource.tags.map(tag => (
+                          <span
+                            key={tag}
+                            className="rounded-full bg-run-gray-100 px-3 py-1 text-xs font-medium text-run-gray-700"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex shrink-0 gap-2 lg:flex-col">
+                    {resource.media_url && (
+                      <Button
+                        asChild
+                        className="bg-orange-600 text-white hover:bg-orange-700"
+                      >
+                        <a
+                          href={resource.media_url}
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
+                        </a>
+                      </Button>
+                    )}
                   </div>
                 </div>
-                <div className="flex shrink-0 gap-2 lg:flex-col">
-                  <Button className="bg-orange-600 text-white hover:bg-orange-700">
-                    Download
-                  </Button>
-                  <Button variant="outline">Preview</Button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card className="p-8 text-center">
+            <p className="mb-4 text-muted-foreground">
+              No resources yet. Be the first to share!
+            </p>
+            <Button asChild variant="outline">
+              <Link href={`/club/${params.slug}/upload`}>Upload Resource</Link>
+            </Button>
+          </Card>
+        )}
       </section>
 
       {/* Contribution CTA */}
@@ -180,7 +230,7 @@ export default async function ResourcesPage() {
           size="lg"
           className="bg-orange-600 text-white hover:bg-orange-700"
         >
-          <Link href="/club/dwtc/upload">Upload Your Resource</Link>
+          <Link href={`/club/${params.slug}/upload`}>Upload Your Resource</Link>
         </Button>
       </section>
     </div>

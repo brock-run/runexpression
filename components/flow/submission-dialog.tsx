@@ -120,7 +120,7 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
 
       let mediaUrl: string | null = null
 
-      // Upload image if present
+      // Upload image if present (still happens client-side to Supabase Storage)
       if (selectedImage) {
         // Extract file extension, falling back to MIME type if no extension in filename
         let fileExt = selectedImage.name.includes('.')
@@ -163,29 +163,37 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
         type = 'image'
       }
 
-      // Create expression event
-      const { error: insertError } = await supabase
-        .from('expression_events')
-        .insert({
-          user_id: user.id,
+      // Submit through API with server-side moderation
+      const response = await fetch('/api/flow/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           type,
           content: content || null,
           content_long: contentLong || null,
           media_url: mediaUrl,
           vibe_tags: selectedTags.length > 0 ? selectedTags : null,
-          moderation_status: 'pending',
-          visibility: 'pending',
-        })
+        }),
+      })
 
-      if (insertError) {
-        throw new Error('Failed to submit. Please try again.')
+      const result = await response.json()
+
+      if (!response.ok) {
+        // Handle moderation rejection with user-friendly message
+        if (result.moderation_flagged) {
+          throw new Error(
+            result.error ||
+              "Your submission couldn't be posted. Please ensure your content is respectful and appropriate."
+          )
+        }
+        throw new Error(result.error || 'Failed to submit. Please try again.')
       }
 
-      // Success
+      // Success - show appropriate message based on moderation status
       resetForm()
       setOpen(false)
-
-      // Show success message or refresh
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
