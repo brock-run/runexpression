@@ -60,12 +60,18 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
         FILE_UPLOAD_LIMITS.ALLOWED_IMAGE_TYPES
       if (!allowedTypes.includes(file.type)) {
         setError('Please select a JPEG, PNG, or HEIC image.')
+        setSelectedImage(null)
+        setImagePreview(null)
+        e.currentTarget.value = ''
         return
       }
 
       // Validate file size
       if (file.size > FILE_UPLOAD_LIMITS.MAX_IMAGE_SIZE) {
         setError('Image must be less than 5MB.')
+        setSelectedImage(null)
+        setImagePreview(null)
+        e.currentTarget.value = ''
         return
       }
 
@@ -121,9 +127,12 @@ export function SubmissionDialog({ children }: SubmissionDialogProps) {
           ? selectedImage.name.split('.').pop()
           : null
         if (!fileExt) {
-          // Fall back to MIME type (e.g., 'image/jpeg' -> 'jpeg')
+          // Fall back to MIME type (e.g., 'image/jpeg' -> 'jpeg', 'image/heic' -> 'heic')
           const mimeExt = selectedImage.type.split('/').pop()
-          fileExt = mimeExt && mimeExt !== 'heic' ? mimeExt : 'jpg'
+          if (!mimeExt) {
+            throw new Error('Unable to determine file type. Please try again.')
+          }
+          fileExt = mimeExt
         }
         const fileName = `${user.id}/${Date.now()}.${fileExt}`
 

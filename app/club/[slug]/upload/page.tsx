@@ -52,6 +52,10 @@ export default function UploadPage() {
         setError(
           `Please select a valid ${type === 'image' ? 'image (JPEG, PNG, HEIC)' : 'document (PDF, GPX)'} file.`
         )
+        // Clear any previous selection
+        setSelectedFile(null)
+        setFilePreview(null)
+        e.currentTarget.value = ''
         return
       }
 
@@ -63,6 +67,10 @@ export default function UploadPage() {
 
       if (file.size > maxSize) {
         setError(`File must be less than ${maxSize / 1024 / 1024}MB.`)
+        // Clear any previous selection
+        setSelectedFile(null)
+        setFilePreview(null)
+        e.currentTarget.value = ''
         return
       }
 
@@ -77,6 +85,10 @@ export default function UploadPage() {
         reader.onerror = () => {
           setError('Failed to preview image.')
           setSelectedFile(null)
+          setFilePreview(null)
+          if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+          }
         }
         reader.readAsDataURL(file)
       }
@@ -125,13 +137,18 @@ export default function UploadPage() {
 
       // Upload file if present
       if (selectedFile) {
-        // Extract file extension with fallback
+        // Extract file extension with fallback - preserve original type including HEIC
         let fileExt = selectedFile.name.includes('.')
           ? selectedFile.name.split('.').pop()
           : null
         if (!fileExt) {
           const mimeExt = selectedFile.type.split('/').pop()
-          fileExt = mimeExt && mimeExt !== 'heic' ? mimeExt : 'bin'
+          if (!mimeExt) {
+            throw new Error(
+              'Unable to determine file type. Please try a different file.'
+            )
+          }
+          fileExt = mimeExt
         }
 
         const fileName = `${slug}/${user.id}/${Date.now()}.${fileExt}`
@@ -245,7 +262,7 @@ export default function UploadPage() {
             <div className="mb-4 text-5xl">📸</div>
             <h3 className="mb-2 text-xl font-bold">Upload Media</h3>
             <p className="text-sm text-muted-foreground">
-              Photos and videos from runs, races, and bacon rituals
+              Photos from runs, races, and bacon rituals
             </p>
           </Card>
 
@@ -385,7 +402,7 @@ export default function UploadPage() {
             </div>
 
             <div>
-              <Label>Photo or Video</Label>
+              <Label>Photo</Label>
               {filePreview ? (
                 <div className="relative mt-2 aspect-video overflow-hidden rounded-lg border border-border">
                   <Image

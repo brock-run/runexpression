@@ -1,10 +1,17 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo } from 'react'
+/**
+ * Hook and utilities for fetching and managing club contributions.
+ * Provides pagination, filtering by type/tags, and real-time refresh capabilities.
+ * @module hooks/use-club-contributions
+ */
+
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database.types'
 import { PAGINATION } from '@/lib/constants'
 
+/** Club contribution record from the database */
 export type ClubContribution = Tables<'club_contributions'>
 
 export type ContributionType = 'story' | 'media' | 'document'
@@ -26,6 +33,12 @@ interface UseClubContributionsReturn {
   refresh: () => Promise<void>
 }
 
+/**
+ * React hook for fetching club contributions with pagination and filtering.
+ * Handles loading states, error handling, and infinite scroll support.
+ * @param options - Configuration options for the query
+ * @returns Object containing contributions, loading state, error, and control functions
+ */
 export function useClubContributions(
   options: UseClubContributionsOptions
 ): UseClubContributionsReturn {
@@ -41,7 +54,7 @@ export function useClubContributions(
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
   const [hasMore, setHasMore] = useState(true)
-  const [offset, setOffset] = useState(0)
+  const offsetRef = useRef(0)
 
   const supabase = useMemo(() => createClient(), [])
 
@@ -51,7 +64,7 @@ export function useClubContributions(
         setIsLoading(true)
         setError(null)
 
-        const currentOffset = reset ? 0 : offset
+        const currentOffset = reset ? 0 : offsetRef.current
         const limit = reset
           ? initialLimit
           : PAGINATION.CLUBHOUSE_LOAD_MORE || initialLimit
@@ -88,10 +101,10 @@ export function useClubContributions(
 
         if (reset) {
           setContributions(data || [])
-          setOffset(limit)
+          offsetRef.current = limit
         } else {
           setContributions(prev => [...prev, ...(data || [])])
-          setOffset(prev => prev + limit)
+          offsetRef.current += limit
         }
 
         setHasMore((data?.length || 0) >= limit)
@@ -105,7 +118,7 @@ export function useClubContributions(
         setIsLoading(false)
       }
     },
-    [supabase, clubId, type, tags, featured, offset, initialLimit]
+    [supabase, clubId, type, tags, featured, initialLimit]
   )
 
   const loadMore = useCallback(async () => {
@@ -114,14 +127,14 @@ export function useClubContributions(
   }, [fetchContributions, hasMore, isLoading])
 
   const refresh = useCallback(async () => {
-    setOffset(0)
+    offsetRef.current = 0
     await fetchContributions(true)
   }, [fetchContributions])
 
   useEffect(() => {
     fetchContributions(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clubId, type, tags?.join(','), featured])
+  }, [clubId, type, JSON.stringify(tags), featured, initialLimit])
 
   return {
     contributions,
@@ -133,8 +146,14 @@ export function useClubContributions(
   }
 }
 
-// Fetch a single club by slug
-export async function getClubBySlug(slug: string) {
+/**
+ * Fetches a single club by its URL slug.
+ * @param slug - The URL-friendly identifier for the club
+ * @returns The club record or null if not found
+ */
+export async function getClubBySlug(
+  slug: string
+): Promise<Tables<'clubs'> | null> {
   const supabase = createClient()
   const { data, error } = await supabase
     .from('clubs')
